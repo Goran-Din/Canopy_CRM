@@ -8,6 +8,7 @@ import healthRoutes from './modules/health/routes.js';
 import authRoutes from './modules/auth/routes.js';
 import customerRoutes from './modules/customers/routes.js';
 import propertyRoutes from './modules/properties/routes.js';
+import contactRoutes from './modules/contacts/routes.js';
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use(healthRoutes);
 app.use(authRoutes);
 app.use(customerRoutes);
 app.use(propertyRoutes);
+app.use(contactRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);
