@@ -34,7 +34,7 @@ export interface JobRow {
   deleted_at: Date | null;
 }
 
-interface JobWithRelations extends JobRow {
+export interface JobWithRelations extends JobRow {
   customer_display_name: string | null;
   property_name: string | null;
   contract_title: string | null;
@@ -69,7 +69,7 @@ interface CountRow {
   count: string;
 }
 
-interface StatRow {
+export interface StatRow {
   label: string;
   count: string;
 }

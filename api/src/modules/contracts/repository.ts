@@ -31,7 +31,7 @@ export interface ContractRow {
   deleted_at: Date | null;
 }
 
-interface ContractWithRelations extends ContractRow {
+export interface ContractWithRelations extends ContractRow {
   customer_display_name: string | null;
   property_name: string | null;
 }
@@ -56,12 +56,12 @@ interface CountRow {
   count: string;
 }
 
-interface StatRow {
+export interface StatRow {
   label: string;
   count: string;
 }
 
-interface ValueStatRow {
+export interface ValueStatRow {
   label: string;
   total_value: string;
 }

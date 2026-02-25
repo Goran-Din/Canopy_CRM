@@ -39,6 +39,10 @@ import TemplateListPage from './pages/sops/TemplateListPage';
 import TemplateDetailPage from './pages/sops/TemplateDetailPage';
 import AssignmentListPage from './pages/sops/AssignmentListPage';
 import IntegrationListPage from './pages/integrations/IntegrationListPage';
+import ReportsPage from './pages/reports/ReportsPage';
+import NotificationPage from './pages/notifications/NotificationPage';
+import SeasonalListPage from './pages/seasonal/SeasonalListPage';
+import SeasonalDetailPage from './pages/seasonal/SeasonalDetailPage';
 
 export default function App() {
   return (
@@ -117,6 +121,16 @@ export default function App() {
 
           {/* Integrations */}
           <Route path="/integrations" element={<IntegrationListPage />} />
+
+          {/* Reports */}
+          <Route path="/reports" element={<ReportsPage />} />
+
+          {/* Notifications */}
+          <Route path="/notifications" element={<NotificationPage />} />
+
+          {/* Seasonal Transitions */}
+          <Route path="/seasonal" element={<SeasonalListPage />} />
+          <Route path="/seasonal/:id" element={<SeasonalDetailPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

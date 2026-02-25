@@ -31,7 +31,7 @@ export interface PropertyRow {
   deleted_at: Date | null;
 }
 
-interface PropertyWithCustomer extends PropertyRow {
+export interface PropertyWithCustomer extends PropertyRow {
   customer_display_name: string | null;
 }
 
@@ -39,7 +39,7 @@ interface CountRow {
   count: string;
 }
 
-interface StatRow {
+export interface StatRow {
   label: string;
   count: string;
 }

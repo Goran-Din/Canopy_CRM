@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuthStore } from '@/stores/authStore';
 import { apiClient } from '@/api/client';
 import { MobileSidebar } from './MobileSidebar';
+import { NotificationBell } from './NotificationBell';
 
 export function TopBar() {
   const user = useAuthStore((s) => s.user);
@@ -57,9 +58,11 @@ export function TopBar() {
       </div>
 
       {/* Spacer for desktop */}
-      <div className="hidden lg:block" />
+      <div className="hidden lg:block flex-1" />
 
-      {/* User menu */}
+      {/* Notification bell + User menu */}
+      <div className="flex items-center gap-1">
+      <NotificationBell />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-2">
@@ -90,6 +93,7 @@ export function TopBar() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      </div>
     </header>
   );
 }

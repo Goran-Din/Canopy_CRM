@@ -24,7 +24,7 @@ export interface ContactRow {
   deleted_at: Date | null;
 }
 
-interface ContactWithRelations extends ContactRow {
+export interface ContactWithRelations extends ContactRow {
   customer_display_name: string | null;
   property_name: string | null;
 }

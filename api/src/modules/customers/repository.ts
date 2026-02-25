@@ -31,7 +31,7 @@ export interface CustomerRow {
   deleted_at: Date | null;
 }
 
-interface CustomerWithCount extends CustomerRow {
+export interface CustomerWithCount extends CustomerRow {
   property_count: number;
 }
 
@@ -39,7 +39,7 @@ interface CountRow {
   count: string;
 }
 
-interface StatRow {
+export interface StatRow {
   label: string;
   count: string;
 }
