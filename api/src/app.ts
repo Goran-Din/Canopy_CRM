@@ -11,6 +11,7 @@ import propertyRoutes from './modules/properties/routes.js';
 import contactRoutes from './modules/contacts/routes.js';
 import contractRoutes from './modules/contracts/routes.js';
 import jobRoutes from './modules/jobs/routes.js';
+import crewRoutes from './modules/crews/routes.js';
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use(propertyRoutes);
 app.use(contactRoutes);
 app.use(contractRoutes);
 app.use(jobRoutes);
+app.use(crewRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);

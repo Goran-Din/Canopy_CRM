@@ -1,0 +1,15 @@
+ALTER TABLE jobs DROP CONSTRAINT IF EXISTS fk_jobs_crew;
+DROP TRIGGER IF EXISTS trg_route_stops_updated_at ON route_stops;
+DROP TABLE IF EXISTS route_stops CASCADE;
+DROP TRIGGER IF EXISTS trg_audit_routes ON routes;
+DROP TRIGGER IF EXISTS trg_routes_updated_at ON routes;
+DROP TABLE IF EXISTS routes CASCADE;
+DROP TRIGGER IF EXISTS trg_crew_members_updated_at ON crew_members;
+DROP TABLE IF EXISTS crew_members CASCADE;
+DROP TRIGGER IF EXISTS trg_audit_crews ON crews;
+DROP TRIGGER IF EXISTS trg_crews_updated_at ON crews;
+DROP TABLE IF EXISTS crews CASCADE;
+DROP TYPE IF EXISTS day_of_week;
+DROP TYPE IF EXISTS route_status;
+DROP TYPE IF EXISTS crew_role;
+DROP TYPE IF EXISTS crew_status;
