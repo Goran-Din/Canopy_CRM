@@ -9,6 +9,7 @@ import authRoutes from './modules/auth/routes.js';
 import customerRoutes from './modules/customers/routes.js';
 import propertyRoutes from './modules/properties/routes.js';
 import contactRoutes from './modules/contacts/routes.js';
+import contractRoutes from './modules/contracts/routes.js';
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use(authRoutes);
 app.use(customerRoutes);
 app.use(propertyRoutes);
 app.use(contactRoutes);
+app.use(contractRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);

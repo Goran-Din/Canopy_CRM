@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS contract_price_history CASCADE;
+DROP TRIGGER IF EXISTS trg_audit_line_items ON contract_line_items;
+DROP TRIGGER IF EXISTS trg_line_items_updated_at ON contract_line_items;
+DROP TABLE IF EXISTS contract_line_items CASCADE;
+DROP TRIGGER IF EXISTS trg_audit_contracts ON service_contracts;
+DROP TRIGGER IF EXISTS trg_contracts_updated_at ON service_contracts;
+DROP TABLE IF EXISTS service_contracts CASCADE;
+DROP TYPE IF EXISTS division_type;
+DROP TYPE IF EXISTS billing_frequency;
+DROP TYPE IF EXISTS contract_status;
+DROP TYPE IF EXISTS contract_type;
