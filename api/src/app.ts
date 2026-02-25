@@ -23,6 +23,9 @@ import materialRoutes from './modules/materials/routes.js';
 import subcontractorRoutes from './modules/subcontractors/routes.js';
 import sopRoutes from './modules/sops/routes.js';
 import integrationRoutes from './modules/integrations/routes.js';
+import reportRoutes from './modules/reports/routes.js';
+import notificationRoutes from './modules/notifications/routes.js';
+import seasonalRoutes from './modules/seasonal/routes.js';
 
 const app = express();
 
@@ -60,6 +63,9 @@ app.use(materialRoutes);
 app.use(subcontractorRoutes);
 app.use(sopRoutes);
 app.use(integrationRoutes);
+app.use(reportRoutes);
+app.use(notificationRoutes);
+app.use(seasonalRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);
