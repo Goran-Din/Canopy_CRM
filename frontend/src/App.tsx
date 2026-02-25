@@ -1,6 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { PortalRoute } from './components/PortalRoute';
+import { CrewRoute } from './components/CrewRoute';
 import { AppLayout } from './components/layout/AppLayout';
+import { PortalLayout } from './components/layout/PortalLayout';
+import { CrewMobileLayout } from './components/layout/CrewMobileLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import CustomerListPage from './pages/customers/CustomerListPage';
@@ -43,6 +47,18 @@ import ReportsPage from './pages/reports/ReportsPage';
 import NotificationPage from './pages/notifications/NotificationPage';
 import SeasonalListPage from './pages/seasonal/SeasonalListPage';
 import SeasonalDetailPage from './pages/seasonal/SeasonalDetailPage';
+import PortalLoginPage from './pages/portal/PortalLoginPage';
+import PortalDashboardPage from './pages/portal/PortalDashboardPage';
+import PortalContractsPage from './pages/portal/PortalContractsPage';
+import PortalJobsPage from './pages/portal/PortalJobsPage';
+import PortalInvoicesPage from './pages/portal/PortalInvoicesPage';
+import PortalInvoiceDetailPage from './pages/portal/PortalInvoiceDetailPage';
+import PortalPropertiesPage from './pages/portal/PortalPropertiesPage';
+import CrewLoginPage from './pages/crew-mobile/CrewLoginPage';
+import CrewDashboardPage from './pages/crew-mobile/CrewDashboardPage';
+import CrewJobDetailPage from './pages/crew-mobile/CrewJobDetailPage';
+import CrewTimesheetPage from './pages/crew-mobile/CrewTimesheetPage';
+import CrewProfilePage from './pages/crew-mobile/CrewProfilePage';
 
 export default function App() {
   return (
@@ -131,6 +147,38 @@ export default function App() {
           {/* Seasonal Transitions */}
           <Route path="/seasonal" element={<SeasonalListPage />} />
           <Route path="/seasonal/:id" element={<SeasonalDetailPage />} />
+        </Route>
+
+        {/* Client Portal */}
+        <Route path="/portal/login" element={<PortalLoginPage />} />
+        <Route
+          element={
+            <PortalRoute>
+              <PortalLayout />
+            </PortalRoute>
+          }
+        >
+          <Route path="/portal/dashboard" element={<PortalDashboardPage />} />
+          <Route path="/portal/contracts" element={<PortalContractsPage />} />
+          <Route path="/portal/jobs" element={<PortalJobsPage />} />
+          <Route path="/portal/invoices" element={<PortalInvoicesPage />} />
+          <Route path="/portal/invoices/:id" element={<PortalInvoiceDetailPage />} />
+          <Route path="/portal/properties" element={<PortalPropertiesPage />} />
+        </Route>
+
+        {/* Crew Mobile PWA */}
+        <Route path="/crew/login" element={<CrewLoginPage />} />
+        <Route
+          element={
+            <CrewRoute>
+              <CrewMobileLayout />
+            </CrewRoute>
+          }
+        >
+          <Route path="/crew/dashboard" element={<CrewDashboardPage />} />
+          <Route path="/crew/jobs/:id" element={<CrewJobDetailPage />} />
+          <Route path="/crew/timesheet" element={<CrewTimesheetPage />} />
+          <Route path="/crew/profile" element={<CrewProfilePage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
