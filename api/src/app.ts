@@ -17,6 +17,10 @@ import invoicingRoutes from './modules/invoicing/routes.js';
 import disputeRoutes from './modules/disputes/routes.js';
 import snowRoutes from './modules/snow/routes.js';
 import hardscapeRoutes from './modules/hardscape/routes.js';
+import prospectRoutes from './modules/prospects/routes.js';
+import equipmentRoutes from './modules/equipment/routes.js';
+import materialRoutes from './modules/materials/routes.js';
+import subcontractorRoutes from './modules/subcontractors/routes.js';
 
 const app = express();
 
@@ -48,6 +52,10 @@ app.use(invoicingRoutes);
 app.use(disputeRoutes);
 app.use(snowRoutes);
 app.use(hardscapeRoutes);
+app.use(prospectRoutes);
+app.use(equipmentRoutes);
+app.use(materialRoutes);
+app.use(subcontractorRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);
