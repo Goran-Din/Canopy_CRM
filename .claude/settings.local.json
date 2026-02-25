@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd /c/Users/Goran/canopy_crm && npm run db:seed 2>&1)",
+      "Bash(cd /c/Users/Goran/canopy_crm && npm run dev -w api 2>&1)",
+      "Bash(curl:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)"
+    ]
+  }
+}
