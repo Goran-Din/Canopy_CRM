@@ -23,6 +23,11 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRY: z.string().default('30d'),
 
   LOG_LEVEL: z.string().default('debug'),
+
+  // Xero Integration (optional)
+  XERO_CLIENT_ID: z.string().optional(),
+  XERO_CLIENT_SECRET: z.string().optional(),
+  XERO_REDIRECT_URI: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

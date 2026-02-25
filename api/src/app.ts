@@ -22,6 +22,7 @@ import equipmentRoutes from './modules/equipment/routes.js';
 import materialRoutes from './modules/materials/routes.js';
 import subcontractorRoutes from './modules/subcontractors/routes.js';
 import sopRoutes from './modules/sops/routes.js';
+import integrationRoutes from './modules/integrations/routes.js';
 
 const app = express();
 
@@ -58,6 +59,7 @@ app.use(equipmentRoutes);
 app.use(materialRoutes);
 app.use(subcontractorRoutes);
 app.use(sopRoutes);
+app.use(integrationRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);
