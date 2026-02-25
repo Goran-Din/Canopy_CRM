@@ -1,0 +1,10 @@
+DROP TRIGGER IF EXISTS trg_checklist_updated_at ON job_checklist_items;
+DROP TABLE IF EXISTS job_checklist_items CASCADE;
+DROP TABLE IF EXISTS job_photos CASCADE;
+DROP TRIGGER IF EXISTS trg_audit_jobs ON jobs;
+DROP TRIGGER IF EXISTS trg_jobs_updated_at ON jobs;
+DROP TABLE IF EXISTS jobs CASCADE;
+DROP TYPE IF EXISTS photo_type;
+DROP TYPE IF EXISTS job_priority;
+DROP TYPE IF EXISTS job_status;
+DROP TYPE IF EXISTS job_type;

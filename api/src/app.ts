@@ -10,6 +10,7 @@ import customerRoutes from './modules/customers/routes.js';
 import propertyRoutes from './modules/properties/routes.js';
 import contactRoutes from './modules/contacts/routes.js';
 import contractRoutes from './modules/contracts/routes.js';
+import jobRoutes from './modules/jobs/routes.js';
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use(customerRoutes);
 app.use(propertyRoutes);
 app.use(contactRoutes);
 app.use(contractRoutes);
+app.use(jobRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);
