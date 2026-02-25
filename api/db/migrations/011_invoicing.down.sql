@@ -1,0 +1,11 @@
+DROP TRIGGER IF EXISTS trg_audit_payments ON payments;
+DROP TRIGGER IF EXISTS trg_payments_updated_at ON payments;
+DROP TABLE IF EXISTS payments CASCADE;
+DROP TRIGGER IF EXISTS trg_invoice_line_items_updated_at ON invoice_line_items;
+DROP TABLE IF EXISTS invoice_line_items CASCADE;
+DROP TRIGGER IF EXISTS trg_audit_invoices ON invoices;
+DROP TRIGGER IF EXISTS trg_invoices_updated_at ON invoices;
+DROP TABLE IF EXISTS invoices CASCADE;
+DROP TYPE IF EXISTS xero_sync_status;
+DROP TYPE IF EXISTS payment_method;
+DROP TYPE IF EXISTS invoice_status;
