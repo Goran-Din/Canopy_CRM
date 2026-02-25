@@ -1,0 +1,22 @@
+{
+  "name": "canopy-crm",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "api",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:api": "npm run dev -w api",
+    "dev:frontend": "npm run dev -w frontend",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "migrate:up": "npm run migrate:up -w api",
+    "migrate:down": "npm run migrate:down -w api",
+    "db:seed": "npm run db:seed -w api"
+  }
+}

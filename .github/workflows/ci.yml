@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, staging]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: canopy_crm
+          POSTGRES_USER: canopy
+          POSTGRES_PASSWORD: canopy_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U canopy -d canopy_crm"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: canopy_crm
+      DB_USER: canopy
+      DB_PASSWORD: canopy_dev
+      REDIS_URL: redis://localhost:6379
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate JWT keys
+        run: |
+          mkdir -p api/keys
+          openssl genpkey -algorithm RSA -out api/keys/private.pem -pkeyopt rsa_keygen_bits:2048
+          openssl rsa -pubout -in api/keys/private.pem -out api/keys/public.pem
+
+      - name: Lint (zero warnings)
+        run: |
+          npm run lint -w api -- --max-warnings 0
+          npm run lint -w frontend -- --max-warnings 0
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Run migrations
+        run: npm run migrate:up
+
+      - name: Run seeds
+        run: npm run db:seed
+
+      - name: Test
+        run: npm run test
