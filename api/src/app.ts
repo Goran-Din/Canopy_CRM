@@ -16,6 +16,7 @@ import timeTrackingRoutes from './modules/time-tracking/routes.js';
 import invoicingRoutes from './modules/invoicing/routes.js';
 import disputeRoutes from './modules/disputes/routes.js';
 import snowRoutes from './modules/snow/routes.js';
+import hardscapeRoutes from './modules/hardscape/routes.js';
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use(timeTrackingRoutes);
 app.use(invoicingRoutes);
 app.use(disputeRoutes);
 app.use(snowRoutes);
+app.use(hardscapeRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);
