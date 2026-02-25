@@ -15,6 +15,7 @@ import crewRoutes from './modules/crews/routes.js';
 import timeTrackingRoutes from './modules/time-tracking/routes.js';
 import invoicingRoutes from './modules/invoicing/routes.js';
 import disputeRoutes from './modules/disputes/routes.js';
+import snowRoutes from './modules/snow/routes.js';
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use(crewRoutes);
 app.use(timeTrackingRoutes);
 app.use(invoicingRoutes);
 app.use(disputeRoutes);
+app.use(snowRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);
