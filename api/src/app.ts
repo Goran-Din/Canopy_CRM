@@ -21,6 +21,7 @@ import prospectRoutes from './modules/prospects/routes.js';
 import equipmentRoutes from './modules/equipment/routes.js';
 import materialRoutes from './modules/materials/routes.js';
 import subcontractorRoutes from './modules/subcontractors/routes.js';
+import sopRoutes from './modules/sops/routes.js';
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use(prospectRoutes);
 app.use(equipmentRoutes);
 app.use(materialRoutes);
 app.use(subcontractorRoutes);
+app.use(sopRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);
