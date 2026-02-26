@@ -26,6 +26,8 @@ import integrationRoutes from './modules/integrations/routes.js';
 import reportRoutes from './modules/reports/routes.js';
 import notificationRoutes from './modules/notifications/routes.js';
 import seasonalRoutes from './modules/seasonal/routes.js';
+import userRoutes from './modules/users/routes.js';
+import dispatchRoutes from './modules/dispatch/routes.js';
 
 const app = express();
 
@@ -66,6 +68,8 @@ app.use(integrationRoutes);
 app.use(reportRoutes);
 app.use(notificationRoutes);
 app.use(seasonalRoutes);
+app.use(userRoutes);
+app.use(dispatchRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);

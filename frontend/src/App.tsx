@@ -43,10 +43,14 @@ import TemplateListPage from './pages/sops/TemplateListPage';
 import TemplateDetailPage from './pages/sops/TemplateDetailPage';
 import AssignmentListPage from './pages/sops/AssignmentListPage';
 import IntegrationListPage from './pages/integrations/IntegrationListPage';
+import SettingsPage from './pages/settings/SettingsPage';
+import UserListPage from './pages/settings/UserListPage';
+import UserDetailPage from './pages/settings/UserDetailPage';
 import ReportsPage from './pages/reports/ReportsPage';
 import NotificationPage from './pages/notifications/NotificationPage';
 import SeasonalListPage from './pages/seasonal/SeasonalListPage';
 import SeasonalDetailPage from './pages/seasonal/SeasonalDetailPage';
+import DispatchBoardPage from './pages/dispatch/DispatchBoard';
 import PortalLoginPage from './pages/portal/PortalLoginPage';
 import PortalDashboardPage from './pages/portal/PortalDashboardPage';
 import PortalContractsPage from './pages/portal/PortalContractsPage';
@@ -95,6 +99,9 @@ export default function App() {
           <Route path="/jobs/:id" element={<JobDetailPage />} />
           <Route path="/schedule" element={<SchedulePage />} />
 
+          {/* Dispatch */}
+          <Route path="/dispatch" element={<DispatchBoardPage />} />
+
           {/* Crews & Routes */}
           <Route path="/crews" element={<CrewListPage />} />
           <Route path="/crews/:id" element={<CrewDetailPage />} />
@@ -137,6 +144,11 @@ export default function App() {
 
           {/* Integrations */}
           <Route path="/integrations" element={<IntegrationListPage />} />
+
+          {/* Settings */}
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/settings/users" element={<UserListPage />} />
+          <Route path="/settings/users/:id" element={<UserDetailPage />} />
 
           {/* Reports */}
           <Route path="/reports" element={<ReportsPage />} />

@@ -18,6 +18,8 @@ import {
   HardHat,
   BookOpen,
   Plug,
+  Settings,
+  LayoutGrid,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
@@ -58,6 +60,12 @@ const navSections: NavSection[] = [
       { label: 'Contracts', href: '/contracts', icon: FileText },
       { label: 'Jobs', href: '/jobs', icon: Briefcase },
       { label: 'Crews', href: '/crews', icon: UsersRound },
+      {
+        label: 'Dispatch',
+        href: '/dispatch',
+        icon: LayoutGrid,
+        roles: ['owner', 'div_mgr', 'coordinator'],
+      },
       { label: 'Time Tracking', href: '/time-tracking', icon: Clock },
     ],
   },
@@ -91,6 +99,12 @@ const navSections: NavSection[] = [
         label: 'Integrations',
         href: '/integrations',
         icon: Plug,
+        roles: ['owner'],
+      },
+      {
+        label: 'Settings',
+        href: '/settings',
+        icon: Settings,
         roles: ['owner'],
       },
     ],
