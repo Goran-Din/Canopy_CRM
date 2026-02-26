@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { DataTable, type Column } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { useApiList } from '@/hooks/useApi';
+import { CrewFormDialog } from './CrewFormDialog';
 
 interface Crew {
   id: string; crew_name: string; division: string; status: string;
@@ -27,6 +29,7 @@ export default function CrewListPage() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
   const [division, setDivision] = useState('all');
+  const [showCreate, setShowCreate] = useState(false);
 
   const params: Record<string, unknown> = { page, limit: 25 };
   if (search) params.search = search;
@@ -37,13 +40,23 @@ export default function CrewListPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Crews" description="Manage crew teams" />
+      <PageHeader
+        title="Crews"
+        description="Manage crew teams"
+        actions={
+          <Button onClick={() => setShowCreate(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Crew
+          </Button>
+        }
+      />
       <div className="flex flex-wrap gap-3">
         <div className="relative w-full max-w-sm"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input placeholder="Search crews..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="pl-10" /></div>
         <Select value={status} onValueChange={(v) => { setStatus(v); setPage(1); }}><SelectTrigger className="w-[140px]"><SelectValue placeholder="Status" /></SelectTrigger><SelectContent><SelectItem value="all">All Statuses</SelectItem><SelectItem value="active">Active</SelectItem><SelectItem value="inactive">Inactive</SelectItem><SelectItem value="on_leave">On Leave</SelectItem><SelectItem value="seasonal">Seasonal</SelectItem></SelectContent></Select>
         <Select value={division} onValueChange={(v) => { setDivision(v); setPage(1); }}><SelectTrigger className="w-[160px]"><SelectValue placeholder="Division" /></SelectTrigger><SelectContent><SelectItem value="all">All Divisions</SelectItem><SelectItem value="landscaping_maintenance">Maintenance</SelectItem><SelectItem value="landscaping_projects">Projects</SelectItem><SelectItem value="hardscape">Hardscape</SelectItem><SelectItem value="snow_removal">Snow</SelectItem></SelectContent></Select>
       </div>
       <DataTable columns={columns} data={data?.data ?? []} loading={isLoading} emptyMessage="No crews found." onRowClick={(row) => navigate(`/crews/${row.id}`)} pagination={data?.pagination ? { page: data.pagination.page, totalPages: data.pagination.totalPages, total: data.pagination.total, onPageChange: setPage } : undefined} />
+      <CrewFormDialog open={showCreate} onOpenChange={setShowCreate} />
     </div>
   );
 }

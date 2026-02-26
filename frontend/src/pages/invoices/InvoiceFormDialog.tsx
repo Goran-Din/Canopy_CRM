@@ -29,7 +29,7 @@ interface Props { open: boolean; onOpenChange: (open: boolean) => void; invoice?
 
 export function InvoiceFormDialog({ open, onOpenChange, invoice }: Props) {
   const isEdit = !!invoice;
-  const { data: customersResult } = useApiList<{ id: string; display_name: string }>(['customers', 'select'], '/v1/customers', { limit: 100, status: 'active' }, { enabled: open });
+  const { data: customersResult } = useApiList<{ id: string; display_name: string }>(['customers', 'select'], '/v1/customers', { limit: 100 }, { enabled: open });
 
   const { register, handleSubmit, control, reset, watch, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),

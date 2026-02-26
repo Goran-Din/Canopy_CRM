@@ -558,21 +558,32 @@ export async function getJobsForInvoice(
 // --- Stats ---
 
 export async function getStats(tenantId: string): Promise<{
-  outstandingBalance: string;
-  overdueCount: string;
+  total_count: number;
+  total_amount: string;
+  paid_amount: string;
+  outstanding_amount: string;
+  overdue_count: number;
+  overdue_amount: string;
   revenueByMonth: Array<{ month: string; total: string }>;
   revenueByDivision: Array<{ division: string; total: string }>;
 }> {
-  const outstandingRes = await queryDb<{ total: string }>(
-    `SELECT COALESCE(SUM(balance_due), 0)::text AS total FROM invoices
-     WHERE tenant_id = $1 AND status IN ('sent', 'viewed', 'overdue', 'partially_paid')
-       AND deleted_at IS NULL`,
-    [tenantId],
-  );
-
-  const overdueRes = await queryDb<CountRow>(
-    `SELECT COUNT(*) AS count FROM invoices
-     WHERE tenant_id = $1 AND status = 'overdue' AND deleted_at IS NULL`,
+  const summaryRes = await queryDb<{
+    total_count: string;
+    total_amount: string;
+    paid_amount: string;
+    outstanding_amount: string;
+    overdue_count: string;
+    overdue_amount: string;
+  }>(
+    `SELECT
+       COUNT(*)::text AS total_count,
+       COALESCE(SUM(total), 0)::text AS total_amount,
+       COALESCE(SUM(CASE WHEN status = 'paid' THEN total ELSE total - balance_due END), 0)::text AS paid_amount,
+       COALESCE(SUM(CASE WHEN status IN ('sent', 'viewed', 'overdue', 'partially_paid') THEN balance_due ELSE 0 END), 0)::text AS outstanding_amount,
+       COUNT(*) FILTER (WHERE status = 'overdue')::text AS overdue_count,
+       COALESCE(SUM(CASE WHEN status = 'overdue' THEN balance_due ELSE 0 END), 0)::text AS overdue_amount
+     FROM invoices
+     WHERE tenant_id = $1 AND deleted_at IS NULL`,
     [tenantId],
   );
 
@@ -596,9 +607,14 @@ export async function getStats(tenantId: string): Promise<{
     [tenantId],
   );
 
+  const summary = summaryRes.rows[0];
   return {
-    outstandingBalance: outstandingRes.rows[0].total,
-    overdueCount: overdueRes.rows[0].count,
+    total_count: parseInt(summary.total_count, 10),
+    total_amount: summary.total_amount,
+    paid_amount: summary.paid_amount,
+    outstanding_amount: summary.outstanding_amount,
+    overdue_count: parseInt(summary.overdue_count, 10),
+    overdue_amount: summary.overdue_amount,
     revenueByMonth: monthRes.rows,
     revenueByDivision: divisionRes.rows,
   };

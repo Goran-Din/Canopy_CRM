@@ -85,14 +85,14 @@ function StatCard({
   );
 }
 
-function formatCurrency(amount: string | number): string {
-  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+function formatCurrency(amount: string | number | undefined | null): string {
+  const num = typeof amount === 'string' ? parseFloat(amount) : (amount ?? 0);
   return new Intl.NumberFormat('en-CA', {
     style: 'currency',
     currency: 'CAD',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(num);
+  }).format(isNaN(num) ? 0 : num);
 }
 
 export default function OwnerDashboard() {

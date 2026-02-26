@@ -51,7 +51,7 @@ SELECT
     'marcin@sunsetservices.us',
     crypt('CanopyAdmin2026!', gen_salt('bf', 12)),
     'Marcin',
-    'Nowak'
+    'Lemanski'
 FROM tenants t
 WHERE t.slug = 'sunset-services'
 ON CONFLICT (tenant_id, email) DO NOTHING;

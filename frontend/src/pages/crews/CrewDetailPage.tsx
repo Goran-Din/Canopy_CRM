@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Briefcase } from 'lucide-react';
+import { ArrowLeft, Users, Briefcase, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -8,6 +9,7 @@ import { PageHeader } from '@/components/shared/PageHeader';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { DataTable, type Column } from '@/components/shared/DataTable';
 import { useApiGet, useApiList } from '@/hooks/useApi';
+import { CrewMemberDialog } from './CrewMemberDialog';
 
 interface Member { id: string; user_name: string; role_in_crew: string; email: string | null }
 interface Job { id: string; title: string; status: string; scheduled_date: string | null; priority: string }
@@ -33,6 +35,7 @@ const jobColumns: Column<Job>[] = [
 export default function CrewDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [showAddMember, setShowAddMember] = useState(false);
 
   const { data: crew, isLoading } = useApiGet<Crew>(['crew', id], `/v1/crews/${id}`, undefined, { enabled: !!id });
   const { data: jobsResult } = useApiList<Job>(['jobs', 'crew', id], '/v1/jobs', { assigned_crew_id: id, limit: 50 }, { enabled: !!id });
@@ -59,15 +62,22 @@ export default function CrewDetailPage() {
         </Card>
         <div className="lg:col-span-2">
           <Tabs defaultValue="members">
-            <TabsList>
-              <TabsTrigger value="members"><Users className="mr-1 h-3 w-3" />Members ({crew.members?.length ?? 0})</TabsTrigger>
-              <TabsTrigger value="jobs"><Briefcase className="mr-1 h-3 w-3" />Jobs ({jobsResult?.data.length ?? 0})</TabsTrigger>
-            </TabsList>
-            <TabsContent value="members" className="mt-4"><DataTable columns={memberColumns} data={crew.members ?? []} emptyMessage="No crew members." /></TabsContent>
+            <div className="flex items-center justify-between">
+              <TabsList>
+                <TabsTrigger value="members"><Users className="mr-1 h-3 w-3" />Members ({crew.members?.length ?? 0})</TabsTrigger>
+                <TabsTrigger value="jobs"><Briefcase className="mr-1 h-3 w-3" />Jobs ({jobsResult?.data.length ?? 0})</TabsTrigger>
+              </TabsList>
+              <Button size="sm" onClick={() => setShowAddMember(true)}>
+                <Plus className="mr-1 h-3 w-3" />
+                Add Member
+              </Button>
+            </div>
+            <TabsContent value="members" className="mt-4"><DataTable columns={memberColumns} data={crew.members ?? []} emptyMessage="No crew members. Click 'Add Member' to assign users." /></TabsContent>
             <TabsContent value="jobs" className="mt-4"><DataTable columns={jobColumns} data={jobsResult?.data ?? []} emptyMessage="No jobs assigned." onRowClick={(row) => navigate(`/jobs/${row.id}`)} /></TabsContent>
           </Tabs>
         </div>
       </div>
+      <CrewMemberDialog open={showAddMember} onOpenChange={setShowAddMember} crewId={id!} />
     </div>
   );
 }

@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { FormField } from '@/components/shared/FormField';
 import { useApiMutation, useApiList } from '@/hooks/useApi';
+import { US_STATES } from '@/lib/us-states';
 import { toast } from 'sonner';
 
 const propertyFormSchema = z.object({
@@ -77,7 +78,7 @@ export function PropertyFormDialog({
   const { data: customersResult } = useApiList<CustomerOption>(
     ['customers', 'select'],
     '/v1/customers',
-    { limit: 100, status: 'active' },
+    { limit: 100 },
     { enabled: open },
   );
 
@@ -99,7 +100,7 @@ export function PropertyFormDialog({
       address_line1: '',
       address_line2: '',
       city: '',
-      state: '',
+      state: 'IL',
       zip: '',
       lot_size_sqft: '',
       lawn_area_sqft: '',
@@ -136,7 +137,7 @@ export function PropertyFormDialog({
         address_line1: '',
         address_line2: '',
         city: '',
-        state: '',
+        state: 'IL',
         zip: '',
         lot_size_sqft: '',
         lawn_area_sqft: '',
@@ -279,10 +280,24 @@ export function PropertyFormDialog({
             <FormField label="City" htmlFor="city" error={errors.city?.message}>
               <Input {...register('city')} />
             </FormField>
-            <FormField label="Province" htmlFor="state" error={errors.state?.message}>
-              <Input {...register('state')} />
+            <FormField label="State" htmlFor="state" error={errors.state?.message}>
+              <Select
+                value={watch('state')}
+                onValueChange={(v) => setValue('state', v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select state" />
+                </SelectTrigger>
+                <SelectContent>
+                  {US_STATES.map((s) => (
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </FormField>
-            <FormField label="Postal Code" htmlFor="zip" error={errors.zip?.message}>
+            <FormField label="ZIP Code" htmlFor="zip" error={errors.zip?.message}>
               <Input {...register('zip')} />
             </FormField>
           </div>

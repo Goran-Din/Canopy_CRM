@@ -36,7 +36,7 @@ interface Props {
 
 export function JobFormDialog({ open, onOpenChange, job }: Props) {
   const isEdit = !!job;
-  const { data: customersResult } = useApiList<{ id: string; display_name: string }>(['customers', 'select'], '/v1/customers', { limit: 100, status: 'active' }, { enabled: open });
+  const { data: customersResult } = useApiList<{ id: string; display_name: string }>(['customers', 'select'], '/v1/customers', { limit: 100 }, { enabled: open });
   const { data: propertiesResult } = useApiList<{ id: string; property_name: string | null; address_line1: string | null }>(['properties', 'select'], '/v1/properties', { limit: 100 }, { enabled: open });
   const { data: crewsResult } = useApiList<{ id: string; crew_name: string }>(['crews', 'select'], '/v1/crews', { limit: 100, status: 'active' }, { enabled: open });
 

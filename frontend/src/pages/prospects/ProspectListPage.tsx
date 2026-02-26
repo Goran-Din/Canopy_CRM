@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { DataTable, type Column } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { useApiList } from '@/hooks/useApi';
+import { ProspectFormDialog } from './ProspectFormDialog';
 
 interface Prospect {
   id: string; first_name: string | null; last_name: string | null; company_name: string | null;
@@ -31,6 +33,7 @@ export default function ProspectListPage() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
   const [source, setSource] = useState('all');
+  const [showCreate, setShowCreate] = useState(false);
 
   const params: Record<string, unknown> = { page, limit: 25 };
   if (search) params.search = search;
@@ -41,13 +44,23 @@ export default function ProspectListPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Prospects" description="Manage sales prospects" />
+      <PageHeader
+        title="Prospects"
+        description="Manage sales prospects"
+        actions={
+          <Button onClick={() => setShowCreate(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Prospect
+          </Button>
+        }
+      />
       <div className="flex flex-wrap gap-3">
         <div className="relative w-full max-w-sm"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input placeholder="Search prospects..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="pl-10" /></div>
         <Select value={status} onValueChange={(v) => { setStatus(v); setPage(1); }}><SelectTrigger className="w-[160px]"><SelectValue placeholder="Status" /></SelectTrigger><SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="new">New</SelectItem><SelectItem value="contacted">Contacted</SelectItem><SelectItem value="qualified">Qualified</SelectItem><SelectItem value="proposal_sent">Proposal Sent</SelectItem><SelectItem value="won">Won</SelectItem><SelectItem value="lost">Lost</SelectItem></SelectContent></Select>
         <Select value={source} onValueChange={(v) => { setSource(v); setPage(1); }}><SelectTrigger className="w-[140px]"><SelectValue placeholder="Source" /></SelectTrigger><SelectContent><SelectItem value="all">All Sources</SelectItem><SelectItem value="website">Website</SelectItem><SelectItem value="referral">Referral</SelectItem><SelectItem value="mautic">Mautic</SelectItem><SelectItem value="cold_call">Cold Call</SelectItem><SelectItem value="trade_show">Trade Show</SelectItem></SelectContent></Select>
       </div>
       <DataTable columns={columns} data={data?.data ?? []} loading={isLoading} emptyMessage="No prospects found." onRowClick={(row) => navigate(`/prospects/${row.id}`)} pagination={data?.pagination ? { page: data.pagination.page, totalPages: data.pagination.totalPages, total: data.pagination.total, onPageChange: setPage } : undefined} />
+      <ProspectFormDialog open={showCreate} onOpenChange={setShowCreate} />
     </div>
   );
 }

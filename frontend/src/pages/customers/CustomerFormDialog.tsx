@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { FormField } from '@/components/shared/FormField';
 import { useApiMutation } from '@/hooks/useApi';
+import { US_STATES } from '@/lib/us-states';
 import { toast } from 'sonner';
 
 const customerFormSchema = z
@@ -97,7 +98,7 @@ export function CustomerFormDialog({
       mobile: '',
       billing_address_line1: '',
       billing_city: '',
-      billing_state: '',
+      billing_state: 'IL',
       billing_zip: '',
       notes: '',
     },
@@ -136,7 +137,7 @@ export function CustomerFormDialog({
         mobile: '',
         billing_address_line1: '',
         billing_city: '',
-        billing_state: '',
+        billing_state: 'IL',
         billing_zip: '',
         notes: '',
       });
@@ -279,10 +280,24 @@ export function CustomerFormDialog({
             <FormField label="City" htmlFor="billing_city" error={errors.billing_city?.message}>
               <Input {...register('billing_city')} />
             </FormField>
-            <FormField label="Province" htmlFor="billing_state" error={errors.billing_state?.message}>
-              <Input {...register('billing_state')} />
+            <FormField label="State" htmlFor="billing_state" error={errors.billing_state?.message}>
+              <Select
+                value={watch('billing_state')}
+                onValueChange={(v) => setValue('billing_state', v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select state" />
+                </SelectTrigger>
+                <SelectContent>
+                  {US_STATES.map((s) => (
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </FormField>
-            <FormField label="Postal Code" htmlFor="billing_zip" error={errors.billing_zip?.message}>
+            <FormField label="ZIP Code" htmlFor="billing_zip" error={errors.billing_zip?.message}>
               <Input {...register('billing_zip')} />
             </FormField>
           </div>

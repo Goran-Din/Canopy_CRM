@@ -206,7 +206,7 @@ function DroppableCell({
     <div
       ref={setNodeRef}
       className={cn(
-        'min-h-[48px] transition-colors',
+        'min-h-[72px] transition-colors',
         isOver && 'bg-primary/10',
         className,
       )}
@@ -253,7 +253,7 @@ function DraggableJobBlock({
         onClick(job);
       }}
       className={cn(
-        'relative mx-0.5 my-0.5 cursor-grab rounded px-2 py-1 text-xs text-white shadow-sm select-none',
+        'relative mx-0.5 my-1 cursor-grab rounded px-2 py-1.5 text-xs text-white shadow-sm select-none',
         isDragging && 'z-50 opacity-70',
       )}
     >
@@ -500,10 +500,10 @@ function CurrentTimeLine() {
   return (
     <div
       ref={ref}
-      className="absolute top-0 bottom-0 z-30 w-0.5 bg-red-500 pointer-events-none"
+      className="absolute top-0 bottom-0 z-30 w-[2px] bg-red-500 pointer-events-none"
       style={{ left: `${leftPx}px` }}
     >
-      <div className="absolute -top-1 -left-1.5 h-3 w-3 rounded-full bg-red-500" />
+      <div className="absolute -top-1.5 -left-[5px] h-3 w-3 rounded-full bg-red-500 ring-2 ring-red-500/30 animate-pulse" />
     </div>
   );
 }
@@ -824,7 +824,7 @@ export default function DispatchBoard() {
                   crews.map((crew) => (
                     <div
                       key={crew.id}
-                      className="flex items-center gap-2 border-b px-3 py-2 min-h-[48px]"
+                      className="flex items-center gap-2 border-b px-3 py-3 min-h-[72px]"
                     >
                       <div
                         className="h-3 w-3 rounded-full flex-shrink-0"
@@ -873,7 +873,7 @@ export default function DispatchBoard() {
                     {crews.map((crew) => {
                       const crewJobs = getJobsForCell(crew.id);
                       return (
-                        <div key={crew.id} className="flex min-h-[48px]">
+                        <div key={crew.id} className="flex min-h-[72px]">
                           {TIME_SLOTS.map((slot) => {
                             const cellDate = format(currentDate, 'yyyy-MM-dd');
                             const cellId = `cell-${crew.id}-${cellDate}-${slot}`;
@@ -888,7 +888,7 @@ export default function DispatchBoard() {
                                 data={{ crewId: crew.id, date: cellDate, time: slot }}
                                 className="w-20 border-b border-r"
                               >
-                                <div className="w-20 min-h-[48px] relative">
+                                <div className="w-20 min-h-[72px] relative">
                                   {jobsAtSlot.map((job) => (
                                     <JobPopover
                                       key={job.id}
@@ -946,7 +946,7 @@ export default function DispatchBoard() {
 
                   {/* Crew rows */}
                   {crews.map((crew) => (
-                    <div key={crew.id} className="flex min-h-[48px]">
+                    <div key={crew.id} className="flex min-h-[72px]">
                       {weekDays.map((day) => {
                         const cellDate = format(day, 'yyyy-MM-dd');
                         const cellId = `cell-${crew.id}-${cellDate}`;
@@ -1119,7 +1119,7 @@ function DroppableWeekCell({
     <div
       ref={setNodeRef}
       className={cn(
-        'flex-1 min-h-[48px] border-b border-r p-0.5',
+        'flex-1 min-h-[72px] border-b border-r p-1',
         isTodayDate && 'bg-primary/5',
         isOver && 'bg-primary/10',
       )}

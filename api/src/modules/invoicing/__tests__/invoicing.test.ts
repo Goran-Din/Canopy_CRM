@@ -862,8 +862,12 @@ describe('GET /v1/invoices/stats', () => {
   it('should return financial stats', async () => {
     const token = await loginAs('owner');
     mockGetStats.mockResolvedValue({
-      outstandingBalance: '5650.00',
-      overdueCount: '3',
+      total_count: 15,
+      total_amount: '18150.00',
+      paid_amount: '12500.00',
+      outstanding_amount: '5650.00',
+      overdue_count: 3,
+      overdue_amount: '2100.00',
       revenueByMonth: [{ month: '2026-02', total: '12500.00' }],
       revenueByDivision: [{ division: 'landscaping_maintenance', total: '8000.00' }],
     });
@@ -873,8 +877,10 @@ describe('GET /v1/invoices/stats', () => {
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.data.outstandingBalance).toBe('5650.00');
-    expect(res.body.data.overdueCount).toBe('3');
+    expect(res.body.data.outstanding_amount).toBe('5650.00');
+    expect(res.body.data.overdue_count).toBe(3);
+    expect(res.body.data.total_amount).toBe('18150.00');
+    expect(res.body.data.paid_amount).toBe('12500.00');
   });
 
   it('should deny coordinator from viewing stats', async () => {

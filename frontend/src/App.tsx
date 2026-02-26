@@ -119,6 +119,7 @@ export default function App() {
           <Route path="/disputes/:id" element={<DisputeDetailPage />} />
 
           {/* Snow Operations */}
+          <Route path="/snow" element={<Navigate to="/snow/seasons" replace />} />
           <Route path="/snow/seasons" element={<SeasonListPage />} />
           <Route path="/snow/seasons/:seasonId/runs" element={<RunListPage />} />
           <Route path="/snow/runs/:id" element={<RunDetailPage />} />

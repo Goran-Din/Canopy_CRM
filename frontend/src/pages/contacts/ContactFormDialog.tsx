@@ -35,7 +35,7 @@ interface Props {
 
 export function ContactFormDialog({ open, onOpenChange, contact }: Props) {
   const isEdit = !!contact;
-  const { data: customersResult } = useApiList<{ id: string; display_name: string }>(['customers', 'select'], '/v1/customers', { limit: 100, status: 'active' }, { enabled: open });
+  const { data: customersResult } = useApiList<{ id: string; display_name: string }>(['customers', 'select'], '/v1/customers', { limit: 100 }, { enabled: open });
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
