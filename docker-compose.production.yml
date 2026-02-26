@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    container_name: canopy-api-production
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    env_file: .env.production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - canopy-production
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: canopy-frontend-production
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    depends_on:
+      - api
+    networks:
+      - canopy-production
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: canopy-postgres-production
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: canopy_crm_prod
+      POSTGRES_USER: canopy
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - pgdata-production:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U canopy -d canopy_crm_prod']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - canopy-production
+
+  redis:
+    image: redis:7-alpine
+    container_name: canopy-redis-production
+    restart: unless-stopped
+    volumes:
+      - redisdata-production:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - canopy-production
+
+volumes:
+  pgdata-production:
+  redisdata-production:
+
+networks:
+  canopy-production:
+    driver: bridge

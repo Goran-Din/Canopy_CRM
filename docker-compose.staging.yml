@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    container_name: canopy-api-staging
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    env_file: .env.staging
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - canopy-staging
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: canopy-frontend-staging
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    depends_on:
+      - api
+    networks:
+      - canopy-staging
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: canopy-postgres-staging
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: canopy_crm_staging
+      POSTGRES_USER: canopy
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-canopy_staging}
+    volumes:
+      - pgdata-staging:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U canopy -d canopy_crm_staging']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - canopy-staging
+
+  redis:
+    image: redis:7-alpine
+    container_name: canopy-redis-staging
+    restart: unless-stopped
+    volumes:
+      - redisdata-staging:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - canopy-staging
+
+volumes:
+  pgdata-staging:
+  redisdata-staging:
+
+networks:
+  canopy-staging:
+    driver: bridge
