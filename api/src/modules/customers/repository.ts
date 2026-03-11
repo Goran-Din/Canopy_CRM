@@ -4,6 +4,7 @@ import type { CustomerQuery } from './schema.js';
 export interface CustomerRow {
   id: string;
   tenant_id: string;
+  customer_number: string;
   customer_type: string;
   status: string;
   source: string;
@@ -46,6 +47,7 @@ export interface StatRow {
 
 const ALLOWED_SORT_COLUMNS: Record<string, string> = {
   display_name: 'c.display_name',
+  customer_number: 'c.customer_number',
   created_at: 'c.created_at',
   updated_at: 'c.updated_at',
   status: 'c.status',
@@ -62,7 +64,7 @@ export async function findAll(
 
   if (query.search) {
     conditions.push(
-      `(c.display_name ILIKE $${paramIdx} OR c.email ILIKE $${paramIdx} OR c.phone ILIKE $${paramIdx} OR c.mobile ILIKE $${paramIdx})`,
+      `(c.display_name ILIKE $${paramIdx} OR c.email ILIKE $${paramIdx} OR c.phone ILIKE $${paramIdx} OR c.mobile ILIKE $${paramIdx} OR c.customer_number ILIKE $${paramIdx})`,
     );
     params.push(`%${query.search}%`);
     paramIdx++;
@@ -133,8 +135,15 @@ export async function create(
   userId: string,
 ): Promise<CustomerRow> {
   const result = await queryDb<CustomerRow>(
-    `INSERT INTO customers (
-       tenant_id, customer_type, status, source,
+    `WITH next_num AS (
+       INSERT INTO customer_number_seq (tenant_id, next_val)
+       VALUES ($1, 2)
+       ON CONFLICT (tenant_id)
+       DO UPDATE SET next_val = customer_number_seq.next_val + 1
+       RETURNING next_val - 1 AS num
+     )
+     INSERT INTO customers (
+       tenant_id, customer_number, customer_type, status, source,
        company_name, first_name, last_name, display_name,
        email, phone, mobile,
        billing_address_line1, billing_address_line2,
@@ -142,7 +151,7 @@ export async function create(
        notes, tags, referred_by_customer_id, xero_contact_id,
        created_by, updated_by
      ) VALUES (
-       $1, $2, $3, $4,
+       $1, 'SS-' || LPAD((SELECT num FROM next_num)::text, 4, '0'), $2, $3, $4,
        $5, $6, $7, $8,
        $9, $10, $11,
        $12, $13,

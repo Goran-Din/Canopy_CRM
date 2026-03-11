@@ -77,6 +77,7 @@ const CUSTOMER_ID = 'dddddddd-0000-0000-0000-000000000001';
 const SAMPLE_CUSTOMER = {
   id: CUSTOMER_ID,
   tenant_id: TENANT_A,
+  customer_number: 'SS-0001',
   customer_type: 'residential',
   status: 'active',
   source: 'manual',
@@ -340,6 +341,76 @@ describe('POST /v1/customers', () => {
       .send({ first_name: 'Test', last_name: 'User' });
 
     expect(res.status).toBe(403);
+  });
+});
+
+// ============================================
+// Customer Number Auto-Generation
+// ============================================
+describe('Customer number', () => {
+  it('should include customer_number in created customer response', async () => {
+    const token = await loginAs('owner');
+    mockCustomerFindByEmail.mockResolvedValue(null);
+    mockCustomerCreate.mockResolvedValue({
+      ...SAMPLE_CUSTOMER,
+      customer_number: 'SS-0001',
+    });
+
+    const res = await request(app)
+      .post('/v1/customers')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ first_name: 'John', last_name: 'Doe' });
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.customer_number).toBe('SS-0001');
+  });
+
+  it('should include customer_number in customer list response', async () => {
+    const token = await loginAs('owner');
+    mockCustomerFindAll.mockResolvedValue({
+      rows: [
+        { ...SAMPLE_CUSTOMER, customer_number: 'SS-0001' },
+        { ...SAMPLE_CUSTOMER, id: 'dddddddd-0000-0000-0000-000000000002', customer_number: 'SS-0002' },
+      ],
+      total: 2,
+    });
+
+    const res = await request(app)
+      .get('/v1/customers')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data[0].customer_number).toBe('SS-0001');
+    expect(res.body.data[1].customer_number).toBe('SS-0002');
+  });
+
+  it('should include customer_number in single customer response', async () => {
+    const token = await loginAs('owner');
+    mockCustomerFindById.mockResolvedValue({
+      ...SAMPLE_CUSTOMER,
+      customer_number: 'SS-0005',
+    });
+
+    const res = await request(app)
+      .get(`/v1/customers/${CUSTOMER_ID}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.customer_number).toBe('SS-0005');
+  });
+
+  it('should allow sorting by customer_number', async () => {
+    const token = await loginAs('owner');
+    mockCustomerFindAll.mockResolvedValue({ rows: [], total: 0 });
+
+    await request(app)
+      .get('/v1/customers?sortBy=customer_number&sortOrder=asc')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(mockCustomerFindAll).toHaveBeenCalledWith(
+      TENANT_A,
+      expect.objectContaining({ sortBy: 'customer_number', sortOrder: 'asc' }),
+    );
   });
 });
 

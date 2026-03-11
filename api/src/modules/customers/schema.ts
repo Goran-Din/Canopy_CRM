@@ -76,7 +76,7 @@ export const customerQuerySchema = z.object({
   type: z.enum(customerTypes).optional(),
   tag: z.string().optional(),
   sortBy: z
-    .enum(['display_name', 'created_at', 'updated_at', 'status', 'email'])
+    .enum(['display_name', 'customer_number', 'created_at', 'updated_at', 'status', 'email'])
     .default('created_at'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 });
