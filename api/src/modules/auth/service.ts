@@ -15,20 +15,28 @@ let _publicKey: string | null = null;
 
 function getPrivateKey(): string {
   if (!_privateKey) {
-    _privateKey = readFileSync(
-      resolve(env.JWT_PRIVATE_KEY_PATH || './keys/private.pem'),
-      'utf-8',
-    );
+    if (env.JWT_PRIVATE_KEY) {
+      _privateKey = env.JWT_PRIVATE_KEY.replace(/\\n/g, '\n');
+    } else {
+      _privateKey = readFileSync(
+        resolve(env.JWT_PRIVATE_KEY_PATH || './keys/private.pem'),
+        'utf-8',
+      );
+    }
   }
   return _privateKey;
 }
 
 function getPublicKey(): string {
   if (!_publicKey) {
-    _publicKey = readFileSync(
-      resolve(env.JWT_PUBLIC_KEY_PATH || './keys/public.pem'),
-      'utf-8',
-    );
+    if (env.JWT_PUBLIC_KEY) {
+      _publicKey = env.JWT_PUBLIC_KEY.replace(/\\n/g, '\n');
+    } else {
+      _publicKey = readFileSync(
+        resolve(env.JWT_PUBLIC_KEY_PATH || './keys/public.pem'),
+        'utf-8',
+      );
+    }
   }
   return _publicKey;
 }

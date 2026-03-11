@@ -32,7 +32,6 @@ COPY --from=builder /app/api/dist/ ./api/dist/
 
 # Copy runtime assets
 COPY api/db/ ./api/db/
-COPY api/keys/ ./api/keys/
 
 WORKDIR /app/api
 
