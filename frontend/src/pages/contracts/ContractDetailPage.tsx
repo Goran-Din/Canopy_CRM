@@ -71,6 +71,14 @@ export default function ContractDetailPage() {
             <div><p className="text-xs text-muted-foreground">Billing</p><p className="text-sm capitalize">{contract.billing_frequency.replace(/_/g, ' ')}{contract.auto_renew ? ' (auto-renew)' : ''}</p></div>
             {contract.notes && <div className="pt-2 border-t"><p className="text-xs text-muted-foreground mb-1">Notes</p><p className="text-sm whitespace-pre-wrap">{contract.notes}</p></div>}
 
+            {contract.status === 'active' && (
+              <div className="pt-2 border-t">
+                <Button variant="outline" size="sm" onClick={() => navigate(`/season-setup/${contract.id}`)}>
+                  <Calendar className="h-4 w-4 mr-1" /> Set Up Season
+                </Button>
+              </div>
+            )}
+
             {nextStatuses.length > 0 && (
               <div className="pt-2 border-t space-y-2">
                 <p className="text-xs text-muted-foreground">Change Status</p>
