@@ -107,7 +107,7 @@ export function QuoteTemplateEditor({ templateId, onClose, onSaved }: QuoteTempl
   const [initialized, setInitialized] = useState(false);
 
   const { data: template } = useApiGet<TemplateDetail>(
-    ['template', templateId],
+    ['template', templateId ?? ''],
     `/v1/templates/${templateId}`,
     undefined,
     { enabled: !!templateId },

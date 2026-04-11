@@ -48,7 +48,7 @@ export function EmailTemplateEditor({ templateId, onClose, onSaved }: EmailTempl
   const lastFocusedRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null);
 
   const { data: template } = useApiGet<EmailDetail>(
-    ['template', templateId], `/v1/templates/${templateId}`, undefined, { enabled: !!templateId },
+    ['template', templateId ?? ''], `/v1/templates/${templateId}`, undefined, { enabled: !!templateId },
   );
 
   if (template && !initialized) {
@@ -84,7 +84,7 @@ export function EmailTemplateEditor({ templateId, onClose, onSaved }: EmailTempl
   const fillPreview = (text: string) => {
     let result = text;
     for (const [key, val] of Object.entries(SAMPLE_DATA)) {
-      result = result.replaceAll(key, val);
+      result = result.split(key).join(val);
     }
     return result;
   };
