@@ -53,6 +53,7 @@ import SeasonalListPage from './pages/seasonal/SeasonalListPage';
 import SeasonalDetailPage from './pages/seasonal/SeasonalDetailPage';
 import SeasonSetupWizard from './pages/season-setup/SeasonSetupWizard';
 import DispatchBoardPage from './pages/dispatch/DispatchBoard';
+import LiveCrewMapPage from './pages/live-map/LiveCrewMapPage';
 import PortalLoginPage from './pages/portal/PortalLoginPage';
 import PortalDashboardPage from './pages/portal/PortalDashboardPage';
 import PortalContractsPage from './pages/portal/PortalContractsPage';
@@ -110,6 +111,9 @@ export default function App() {
 
           {/* Dispatch */}
           <Route path="/dispatch" element={<DispatchBoardPage />} />
+
+          {/* Live Crew Map */}
+          <Route path="/live-map" element={<LiveCrewMapPage />} />
 
           {/* Crews & Routes */}
           <Route path="/crews" element={<CrewListPage />} />
