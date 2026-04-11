@@ -10,9 +10,11 @@ const mockUseApiGet = vi.fn();
 const mockUseApiMutation = vi.fn(() => ({ mutateAsync: mockMutateAsync }));
 
 vi.mock('@/hooks/useApi', () => ({
-  useApiGet: (...args: unknown[]) => mockUseApiGet(...args),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useApiGet: (...args: any[]) => mockUseApiGet(...args),
   useApiList: vi.fn(() => ({ data: [], pagination: {} })),
-  useApiMutation: (...args: unknown[]) => mockUseApiMutation(...args),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useApiMutation: (..._args: any[]) => mockUseApiMutation(),
 }));
 
 vi.mock('@/api/client', () => ({

@@ -7,6 +7,7 @@ export interface AuthUserInfo {
   last_name: string;
   tenant_id: string;
   roles: Array<{ role: string; division_id: string | null }>;
+  customer_id?: string; // Present for portal (client) users
 }
 
 interface AuthState {
