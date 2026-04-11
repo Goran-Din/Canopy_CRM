@@ -20,6 +20,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { DataTable } from '@/components/shared/DataTable';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { CustomerFormDialog } from './CustomerFormDialog';
+import { FileLibrary } from '@/components/files/FileLibrary';
 import { useApiGet, useApiList, useApiMutation } from '@/hooks/useApi';
 import { toast } from 'sonner';
 import type { Column } from '@/components/shared/DataTable';
@@ -289,6 +290,9 @@ export default function CustomerDetailPage() {
               <TabsTrigger value="contracts">
                 Contracts ({contractsResult?.data.length ?? 0})
               </TabsTrigger>
+              <TabsTrigger value="files">
+                Files
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="properties" className="mt-4">
@@ -306,6 +310,10 @@ export default function CustomerDetailPage() {
                 data={contractsResult?.data ?? []}
                 emptyMessage="No contracts for this customer."
               />
+            </TabsContent>
+
+            <TabsContent value="files" className="mt-4">
+              <FileLibrary customerId={id!} />
             </TabsContent>
           </Tabs>
         </div>
