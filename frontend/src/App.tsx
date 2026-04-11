@@ -63,12 +63,16 @@ import CrewDashboardPage from './pages/crew-mobile/CrewDashboardPage';
 import CrewJobDetailPage from './pages/crew-mobile/CrewJobDetailPage';
 import CrewTimesheetPage from './pages/crew-mobile/CrewTimesheetPage';
 import CrewProfilePage from './pages/crew-mobile/CrewProfilePage';
+import SigningPage from './pages/signing/SigningPage';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+
+        {/* Public signing page — no auth required */}
+        <Route path="/sign/:token" element={<SigningPage />} />
 
         {/* Protected routes with shared layout */}
         <Route
