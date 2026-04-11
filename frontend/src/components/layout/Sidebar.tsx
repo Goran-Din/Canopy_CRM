@@ -105,6 +105,18 @@ const navSections: NavSection[] = [
     ],
   },
   {
+    title: 'Reports',
+    items: [
+      { label: 'Reports', href: '/reports', icon: LayoutGrid },
+      {
+        label: 'Analytics',
+        href: '/reports/analytics',
+        icon: LayoutGrid,
+        roles: ['owner', 'div_mgr'],
+      },
+    ],
+  },
+  {
     title: 'Admin',
     items: [
       {
