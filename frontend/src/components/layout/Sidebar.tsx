@@ -107,6 +107,12 @@ const navSections: NavSection[] = [
         icon: Settings,
         roles: ['owner'],
       },
+      {
+        label: 'Templates',
+        href: '/settings/templates',
+        icon: FileText,
+        roles: ['owner', 'div_mgr'],
+      },
     ],
   },
 ];

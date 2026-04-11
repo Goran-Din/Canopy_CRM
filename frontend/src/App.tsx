@@ -43,6 +43,7 @@ import TemplateListPage from './pages/sops/TemplateListPage';
 import TemplateDetailPage from './pages/sops/TemplateDetailPage';
 import AssignmentListPage from './pages/sops/AssignmentListPage';
 import IntegrationListPage from './pages/integrations/IntegrationListPage';
+import TemplatesPage from './pages/templates/TemplatesPage';
 import SettingsPage from './pages/settings/SettingsPage';
 import UserListPage from './pages/settings/UserListPage';
 import UserDetailPage from './pages/settings/UserDetailPage';
@@ -156,6 +157,10 @@ export default function App() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/settings/users" element={<UserListPage />} />
           <Route path="/settings/users/:id" element={<UserDetailPage />} />
+
+          {/* Templates */}
+          <Route path="/settings/templates" element={<TemplatesPage />} />
+          <Route path="/settings/templates/:tab" element={<TemplatesPage />} />
 
           {/* Reports */}
           <Route path="/reports" element={<ReportsPage />} />
