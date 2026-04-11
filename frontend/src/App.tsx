@@ -7,6 +7,7 @@ import { PortalLayout } from './components/layout/PortalLayout';
 import { CrewMobileLayout } from './components/layout/CrewMobileLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import CommandCenterPage from './pages/command-center/CommandCenterPage';
 import CustomerListPage from './pages/customers/CustomerListPage';
 import CustomerDetailPage from './pages/customers/CustomerDetailPage';
 import PropertyListPage from './pages/properties/PropertyListPage';
@@ -87,7 +88,7 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<CommandCenterPage />} />
 
           {/* Customers & Properties */}
           <Route path="/customers" element={<CustomerListPage />} />
@@ -174,6 +175,7 @@ export default function App() {
 
           {/* Reports */}
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/reports/analytics" element={<DashboardPage />} />
 
           {/* Notifications */}
           <Route path="/notifications" element={<NotificationPage />} />
