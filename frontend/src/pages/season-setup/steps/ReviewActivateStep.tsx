@@ -1,0 +1,1 @@
+export function ReviewActivateStep({ contract, wizardData, onActivate, isActivating }: { contract: any; wizardData: any; onActivate: () => void; isActivating: boolean }) { return <div>Step 4: Review & Activate</div>; }

@@ -51,6 +51,7 @@ import ReportsPage from './pages/reports/ReportsPage';
 import NotificationPage from './pages/notifications/NotificationPage';
 import SeasonalListPage from './pages/seasonal/SeasonalListPage';
 import SeasonalDetailPage from './pages/seasonal/SeasonalDetailPage';
+import SeasonSetupWizard from './pages/season-setup/SeasonSetupWizard';
 import DispatchBoardPage from './pages/dispatch/DispatchBoard';
 import PortalLoginPage from './pages/portal/PortalLoginPage';
 import PortalDashboardPage from './pages/portal/PortalDashboardPage';
@@ -171,6 +172,9 @@ export default function App() {
           {/* Seasonal Transitions */}
           <Route path="/seasonal" element={<SeasonalListPage />} />
           <Route path="/seasonal/:id" element={<SeasonalDetailPage />} />
+
+          {/* Season Setup Wizard */}
+          <Route path="/season-setup/:contractId" element={<SeasonSetupWizard />} />
         </Route>
 
         {/* Client Portal */}
