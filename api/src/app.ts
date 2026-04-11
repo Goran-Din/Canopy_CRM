@@ -37,6 +37,7 @@ import templateRoutes from './modules/templates/routes.js';
 import automationRoutes from './modules/automations/routes.js';
 import feedbackRoutes from './modules/feedback/routes.js';
 import geofenceRoutes from './modules/geofence/routes.js';
+import commandCenterRoutes from './modules/command-center/routes.js';
 
 const app = express();
 
@@ -88,6 +89,7 @@ app.use(templateRoutes);
 app.use(automationRoutes);
 app.use(feedbackRoutes);
 app.use(geofenceRoutes);
+app.use(commandCenterRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);
