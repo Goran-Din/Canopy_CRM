@@ -73,6 +73,12 @@ const navSections: NavSection[] = [
     title: 'Finance',
     items: [
       { label: 'Invoices', href: '/invoices', icon: Receipt },
+      {
+        label: 'Billing',
+        href: '/billing',
+        icon: Receipt,
+        roles: ['owner', 'div_mgr'],
+      },
       { label: 'Disputes', href: '/disputes', icon: AlertTriangle },
     ],
   },

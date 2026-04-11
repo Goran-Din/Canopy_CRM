@@ -67,6 +67,7 @@ import CrewJobDetailPage from './pages/crew-mobile/CrewJobDetailPage';
 import CrewTimesheetPage from './pages/crew-mobile/CrewTimesheetPage';
 import CrewProfilePage from './pages/crew-mobile/CrewProfilePage';
 import SigningPage from './pages/signing/SigningPage';
+import BillingDashboard from './pages/billing/BillingDashboard';
 
 export default function App() {
   return (
@@ -125,6 +126,10 @@ export default function App() {
           <Route path="/invoices/:id" element={<InvoiceDetailPage />} />
           <Route path="/disputes" element={<DisputeListPage />} />
           <Route path="/disputes/:id" element={<DisputeDetailPage />} />
+
+          {/* Billing Dashboard */}
+          <Route path="/billing" element={<BillingDashboard />} />
+          <Route path="/billing/:section" element={<BillingDashboard />} />
 
           {/* Snow Operations */}
           <Route path="/snow" element={<Navigate to="/snow/seasons" replace />} />
