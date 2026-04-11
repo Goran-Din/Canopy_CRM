@@ -5,7 +5,10 @@
       "Bash(cd /c/Users/Goran/canopy_crm && npm run dev -w api 2>&1)",
       "Bash(curl:*)",
       "Bash(netstat:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

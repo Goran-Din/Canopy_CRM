@@ -1,15 +1,40 @@
-// ============================================
-// Canopy Quotes Integration Client — STUB
-// ============================================
+import { logger } from '../../../config/logger.js';
 
-export async function getQuote(_tenantId: string, _quoteId: string): Promise<{ message: string }> {
-  return { message: 'Canopy Quotes get-quote stub — not yet implemented' };
-}
+export class CanopyQuotesClient {
+  private baseUrl: string;
+  private apiKey: string;
 
-export async function listQuotes(_tenantId: string): Promise<{ message: string; data: unknown[] }> {
-  return { message: 'Canopy Quotes list-quotes stub — not yet implemented', data: [] };
-}
+  constructor(config: { baseUrl: string; apiKey: string }) {
+    this.baseUrl = config.baseUrl;
+    this.apiKey = config.apiKey;
+  }
 
-export async function convertQuoteToContract(_tenantId: string, _quoteId: string): Promise<{ message: string }> {
-  return { message: 'Canopy Quotes convert-to-contract stub — not yet implemented' };
+  async sendStatusWebhook(payload: {
+    source_quote_number: string;
+    crm_job_id: string;
+    job_number: string;
+    status: string;
+    updated_at: string;
+    details?: Record<string, unknown>;
+  }): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await fetch(`${this.baseUrl}/webhooks/crm-status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': this.apiKey,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Canopy Quotes webhook failed: ${response.status}`);
+      }
+
+      return { success: true };
+    } catch (error) {
+      logger.error('Canopy Quotes webhook error', { error: (error as Error).message });
+      return { success: false, error: (error as Error).message };
+    }
+  }
 }

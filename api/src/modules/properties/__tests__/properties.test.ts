@@ -63,6 +63,18 @@ vi.mock('../repository.js', () => ({
   getStats: (...args: unknown[]) => mockPropertyGetStats(...args),
   hasActiveContracts: (...args: unknown[]) => mockPropertyHasActiveContracts(...args),
   customerExists: (...args: unknown[]) => mockPropertyCustomerExists(...args),
+  updateProfile: vi.fn(),
+  getKnowledgeCard: vi.fn(),
+  getCategorySummary: vi.fn(),
+  insertCrewNote: vi.fn(),
+  findCrewNotes: vi.fn(),
+  getJobHistory: vi.fn(),
+  getPropertyPhotos: vi.fn(),
+}));
+
+vi.mock('../service-history/service-history.service.js', () => ({
+  getServiceHistory: vi.fn(),
+  getEstimationContext: vi.fn(),
 }));
 
 import app from '../../../app.js';

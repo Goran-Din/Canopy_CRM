@@ -1,4 +1,5 @@
-import { queryDb } from '../../config/database.js';
+import type pg from 'pg';
+import { queryDb, getClient } from '../../config/database.js';
 import type { JobQuery, ScheduleQuery } from './schema.js';
 
 export interface JobRow {
@@ -32,6 +33,10 @@ export interface JobRow {
   created_at: Date;
   updated_at: Date;
   deleted_at: Date | null;
+  // V2 fields
+  job_number: string | null;
+  creation_path: string | null;
+  badge_ids: string[];
 }
 
 export interface JobWithRelations extends JobRow {
@@ -616,4 +621,132 @@ export async function contractExists(
     [contractId, tenantId],
   );
   return parseInt(result.rows[0].count, 10) > 0;
+}
+
+// --- V2 Functions ---
+
+interface JobNumberRow {
+  job_number: string;
+}
+
+/**
+ * Get next job number using the atomic next_job_number() function.
+ */
+export async function getNextJobNumber(
+  client: pg.PoolClient,
+  tenantId: string,
+  year: number,
+): Promise<string> {
+  const result = await client.query<JobNumberRow>(
+    `SELECT next_job_number($1, $2::SMALLINT) AS job_number`,
+    [tenantId, year],
+  );
+  return result.rows[0].job_number;
+}
+
+/**
+ * Create job within a transaction client (V2 — includes job_number and creation_path).
+ */
+export async function createWithClient(
+  client: pg.PoolClient,
+  tenantId: string,
+  data: Record<string, unknown>,
+  userId: string,
+): Promise<JobRow> {
+  const result = await client.query<JobRow>(
+    `INSERT INTO jobs (
+       tenant_id, contract_id, customer_id, property_id,
+       division, job_type, status, priority,
+       title, description,
+       scheduled_date, scheduled_start_time, estimated_duration_minutes,
+       assigned_crew_id, assigned_to,
+       notes, requires_photos, weather_condition, tags,
+       created_by, updated_by,
+       job_number, creation_path
+     ) VALUES (
+       $1, $2, $3, $4,
+       $5, $6, $7, $8,
+       $9, $10,
+       $11, $12, $13,
+       $14, $15,
+       $16, $17, $18, $19,
+       $20, $20,
+       $21, $22
+     )
+     RETURNING *`,
+    [
+      tenantId,
+      data.contract_id || null,
+      data.customer_id,
+      data.property_id,
+      data.division,
+      data.job_type,
+      data.status,
+      data.priority,
+      data.title,
+      data.description || null,
+      data.scheduled_date || null,
+      data.scheduled_start_time || null,
+      data.estimated_duration_minutes ?? null,
+      data.assigned_crew_id || null,
+      data.assigned_to || null,
+      data.notes || null,
+      data.requires_photos ?? false,
+      data.weather_condition || null,
+      data.tags || [],
+      userId,
+      data.job_number || null,
+      data.creation_path || null,
+    ],
+  );
+  return result.rows[0];
+}
+
+/**
+ * Update job status within a transaction client (V2 — for diary integration).
+ */
+export async function updateStatusWithClient(
+  client: pg.PoolClient,
+  tenantId: string,
+  id: string,
+  newStatus: string,
+  completionNotes: string | null,
+  userId: string,
+  extraFields?: Record<string, unknown>,
+): Promise<JobRow | null> {
+  const setClauses = ['status = $1', 'updated_by = $2'];
+  const params: unknown[] = [newStatus, userId];
+  let paramIdx = 3;
+
+  if (completionNotes !== undefined && completionNotes !== null) {
+    setClauses.push(`completion_notes = $${paramIdx}`);
+    params.push(completionNotes);
+    paramIdx++;
+  }
+
+  if (extraFields) {
+    for (const [col, val] of Object.entries(extraFields)) {
+      setClauses.push(`${col} = $${paramIdx}`);
+      params.push(val);
+      paramIdx++;
+    }
+  }
+
+  params.push(id);
+  params.push(tenantId);
+
+  const result = await client.query<JobRow>(
+    `UPDATE jobs SET ${setClauses.join(', ')}
+     WHERE id = $${paramIdx - 1} AND tenant_id = $${paramIdx} AND deleted_at IS NULL
+     RETURNING *`,
+    params,
+  );
+  return result.rows[0] || null;
+}
+
+/**
+ * Acquire a database client for transactions.
+ */
+export async function acquireClient(): Promise<pg.PoolClient> {
+  return getClient();
 }

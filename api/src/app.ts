@@ -28,6 +28,15 @@ import notificationRoutes from './modules/notifications/routes.js';
 import seasonalRoutes from './modules/seasonal/routes.js';
 import userRoutes from './modules/users/routes.js';
 import dispatchRoutes from './modules/dispatch/routes.js';
+import fileRoutes from './modules/files/routes.js';
+import quoteRoutes from './modules/quotes/routes.js';
+import signatureRoutes from './modules/signatures/routes.js';
+import serviceOccurrenceRoutes from './modules/service-occurrences/routes.js';
+import billingRoutes from './modules/billing/routes.js';
+import templateRoutes from './modules/templates/routes.js';
+import automationRoutes from './modules/automations/routes.js';
+import feedbackRoutes from './modules/feedback/routes.js';
+import geofenceRoutes from './modules/geofence/routes.js';
 
 const app = express();
 
@@ -70,6 +79,15 @@ app.use(notificationRoutes);
 app.use(seasonalRoutes);
 app.use(userRoutes);
 app.use(dispatchRoutes);
+app.use(fileRoutes);
+app.use(signatureRoutes);
+app.use(quoteRoutes);
+app.use(serviceOccurrenceRoutes);
+app.use(billingRoutes);
+app.use(templateRoutes);
+app.use(automationRoutes);
+app.use(feedbackRoutes);
+app.use(geofenceRoutes);
 
 // Error handling (must be last)
 app.use(errorHandler);

@@ -1,0 +1,2 @@
+DROP FUNCTION IF EXISTS next_job_number(UUID, SMALLINT);
+DROP TABLE IF EXISTS job_number_seq;

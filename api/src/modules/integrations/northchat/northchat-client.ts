@@ -1,11 +1,12 @@
-// ============================================
-// NorthChat Integration Client — STUB
-// ============================================
+import crypto from 'node:crypto';
 
-export async function getContext(_tenantId: string): Promise<{ message: string }> {
-  return { message: 'NorthChat get-context stub — not yet implemented' };
-}
-
-export async function sendNotification(_tenantId: string, _data: unknown): Promise<{ message: string }> {
-  return { message: 'NorthChat send-notification stub — not yet implemented' };
+export class NorthChatClient {
+  static validateWebhookSignature(payload: string, signature: string, secret: string): boolean {
+    const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+    try {
+      return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+    } catch {
+      return false;
+    }
+  }
 }

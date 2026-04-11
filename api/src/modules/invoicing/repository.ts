@@ -557,7 +557,7 @@ export async function getJobsForInvoice(
 
 // --- Stats ---
 
-export async function getStats(tenantId: string): Promise<{
+export async function getStats(tenantId: string, divisionId?: string): Promise<{
   total_count: number;
   total_amount: string;
   paid_amount: string;
@@ -567,6 +567,9 @@ export async function getStats(tenantId: string): Promise<{
   revenueByMonth: Array<{ month: string; total: string }>;
   revenueByDivision: Array<{ division: string; total: string }>;
 }> {
+  const params: (string)[] = [tenantId];
+  const divisionFilter = divisionId ? ` AND division = $${params.push(divisionId)}` : '';
+
   const summaryRes = await queryDb<{
     total_count: string;
     total_amount: string;
@@ -583,19 +586,22 @@ export async function getStats(tenantId: string): Promise<{
        COUNT(*) FILTER (WHERE status = 'overdue')::text AS overdue_count,
        COALESCE(SUM(CASE WHEN status = 'overdue' THEN balance_due ELSE 0 END), 0)::text AS overdue_amount
      FROM invoices
-     WHERE tenant_id = $1 AND deleted_at IS NULL`,
-    [tenantId],
+     WHERE tenant_id = $1 AND deleted_at IS NULL${divisionFilter}`,
+    params,
   );
+
+  const monthParams: (string)[] = [tenantId];
+  const monthDivisionFilter = divisionId ? ` AND division = $${monthParams.push(divisionId)}` : '';
 
   const monthRes = await queryDb<{ month: string; total: string }>(
     `SELECT TO_CHAR(invoice_date, 'YYYY-MM') AS month,
             COALESCE(SUM(total), 0)::text AS total
      FROM invoices
-     WHERE tenant_id = $1 AND status IN ('paid', 'partially_paid') AND deleted_at IS NULL
+     WHERE tenant_id = $1 AND status IN ('paid', 'partially_paid') AND deleted_at IS NULL${monthDivisionFilter}
      GROUP BY TO_CHAR(invoice_date, 'YYYY-MM')
      ORDER BY month DESC
      LIMIT 12`,
-    [tenantId],
+    monthParams,
   );
 
   const divisionRes = await queryDb<{ division: string; total: string }>(

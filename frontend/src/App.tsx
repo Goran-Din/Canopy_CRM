@@ -16,7 +16,7 @@ import ContactDetailPage from './pages/contacts/ContactDetailPage';
 import ContractListPage from './pages/contracts/ContractListPage';
 import ContractDetailPage from './pages/contracts/ContractDetailPage';
 import JobListPage from './pages/jobs/JobListPage';
-import JobDetailPage from './pages/jobs/JobDetailPage';
+import JobCard from './pages/jobs/job-card/JobCard';
 import SchedulePage from './pages/jobs/SchedulePage';
 import CrewListPage from './pages/crews/CrewListPage';
 import CrewDetailPage from './pages/crews/CrewDetailPage';
@@ -101,7 +101,8 @@ export default function App() {
 
           {/* Jobs & Scheduling */}
           <Route path="/jobs" element={<JobListPage />} />
-          <Route path="/jobs/:id" element={<JobDetailPage />} />
+          <Route path="/jobs/:id" element={<JobCard />} />
+          <Route path="/jobs/:id/:tab" element={<JobCard />} />
           <Route path="/schedule" element={<SchedulePage />} />
 
           {/* Dispatch */}

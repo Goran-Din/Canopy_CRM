@@ -130,7 +130,8 @@ export async function generateFromJobs(req: Request, res: Response, next: NextFu
 
 export async function getStats(req: Request, res: Response, next: NextFunction) {
   try {
-    const stats = await invoiceService.getInvoiceStats(req.tenantId!);
+    const divisionId = req.query.division_id as string | undefined;
+    const stats = await invoiceService.getInvoiceStats(req.tenantId!, divisionId);
     res.json({ status: 'success', data: stats });
   } catch (err) {
     next(err);

@@ -85,6 +85,44 @@ export async function getSyncLogsByEntity(req: Request, res: Response, next: Nex
   } catch (err) { next(err); }
 }
 
+// ======== Xero Items Sync ========
+
+export async function triggerItemSync(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { syncXeroItems } = await import('./xero/xero-items.js');
+    const result = await syncXeroItems(req.tenantId!, true);
+    res.json({ status: 'success', data: result });
+  } catch (err) { next(err); }
+}
+
+// ======== NorthChat Webhook ========
+
+export async function handleNorthChatWebhookCtrl(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { handleNorthChatWebhook } = await import('./northchat/northchat-webhook.js');
+    const result = await handleNorthChatWebhook(req.tenantId!, req.body);
+    res.json({ status: 'success', data: result });
+  } catch (err) { next(err); }
+}
+
+export async function northchatJobLookup(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { lookupJob } = await import('./northchat/northchat-webhook.js');
+    const result = await lookupJob(req.tenantId!, req.query.job_number as string);
+    res.json({ status: 'success', data: result });
+  } catch (err) { next(err); }
+}
+
+// ======== Canopy Quotes Conversion ========
+
+export async function convertQuote(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { convertQuoteToJob } = await import('./canopy-quotes/convert-service.js');
+    const result = await convertQuoteToJob(req.tenantId!, req.body);
+    res.status(201).json({ status: 'success', data: result });
+  } catch (err) { next(err); }
+}
+
 // ======== Stub Integration Endpoints ========
 
 export async function stubEndpoint(req: Request, res: Response, next: NextFunction) {

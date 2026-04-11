@@ -16,8 +16,39 @@ import {
   quoteParamsSchema,
 } from './schema.js';
 import * as ctrl from './controller.js';
+import { handleWebhook } from './xero/xero-webhook.js';
+import { apiKeyAuth } from '../../middleware/api-key-auth.js';
+import { convertQuoteSchema, northchatWebhookSchema, jobLookupSchema } from './schema.js';
 
 const router = Router();
+
+// ======== Xero Webhook (PUBLIC — no auth, signature-validated) ========
+router.post('/v1/webhooks/xero', handleWebhook);
+
+// ======== Canopy Quotes Inbound (API Key auth, not JWT) ========
+router.post('/v1/integrations/quotes/convert',
+  apiKeyAuth('canopy_quotes'),
+  validate(convertQuoteSchema),
+  ctrl.convertQuote);
+
+// ======== NorthChat Webhook (API Key auth) ========
+router.post('/v1/webhooks/northchat',
+  apiKeyAuth('northchat'),
+  validate(northchatWebhookSchema),
+  ctrl.handleNorthChatWebhookCtrl);
+
+// ======== NorthChat Job Lookup (API Key or Staff JWT) ========
+router.get('/v1/integrations/northchat/job-lookup',
+  apiKeyAuth('northchat'),
+  validate(jobLookupSchema, 'query'),
+  ctrl.northchatJobLookup);
+
+// ======== Xero Items Sync (outside /v1/integrations prefix for auth) ========
+router.post('/v1/xero-items/sync',
+  authenticate,
+  tenantScope,
+  requireRole('owner'),
+  ctrl.triggerItemSync);
 
 // All integration routes require auth + tenant scoping
 router.use('/v1/integrations', authenticate, tenantScope);

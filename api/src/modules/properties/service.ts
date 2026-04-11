@@ -1,6 +1,8 @@
 import { AppError } from '../../middleware/errorHandler.js';
-import type { CreatePropertyInput, UpdatePropertyInput, PropertyQuery } from './schema.js';
+import type { CreatePropertyInput, UpdatePropertyInput, PropertyQuery, UpdatePropertyProfileInput, AddCrewNoteInput } from './schema.js';
 import * as repo from './repository.js';
+import * as serviceHistoryService from './service-history/service-history.service.js';
+import * as geofenceService from '../geofence/service.js';
 
 function generateGoogleMapsUrl(lat: number, lng: number): string {
   return `https://www.google.com/maps?q=${lat},${lng}`;
@@ -54,7 +56,19 @@ export async function createProperty(
   }
 
   const data = { ...input, google_maps_url: googleMapsUrl };
-  return repo.create(tenantId, data, userId);
+  const property = await repo.create(tenantId, data, userId);
+
+  // Auto-set default geofence from property GPS coordinates
+  if (input.latitude != null && input.longitude != null) {
+    geofenceService.setDefaultGeofence(
+      property.id, input.latitude, input.longitude,
+      (input as Record<string, unknown>).property_category as string | undefined,
+    ).catch(() => {
+      // Geofence setup failure should not fail property creation
+    });
+  }
+
+  return property;
 }
 
 export async function updateProperty(
@@ -116,4 +130,74 @@ export async function deleteProperty(tenantId: string, id: string) {
 
 export async function getPropertyStats(tenantId: string) {
   return repo.getStats(tenantId);
+}
+
+// --- V2 Functions ---
+
+export async function updateProfile(
+  tenantId: string,
+  propertyId: string,
+  input: UpdatePropertyProfileInput,
+) {
+  const existing = await repo.findById(tenantId, propertyId);
+  if (!existing) throw new AppError(404, 'Property not found');
+
+  const updated = await repo.updateProfile(tenantId, propertyId, input);
+  if (!updated) throw new AppError(500, 'Failed to update property profile');
+  return updated;
+}
+
+export async function getKnowledgeCard(tenantId: string, propertyId: string) {
+  const card = await repo.getKnowledgeCard(tenantId, propertyId);
+  if (!card) throw new AppError(404, 'Property not found');
+  return card;
+}
+
+export async function getServiceHistory(tenantId: string, propertyId: string) {
+  const existing = await repo.findById(tenantId, propertyId);
+  if (!existing) throw new AppError(404, 'Property not found');
+  return serviceHistoryService.getServiceHistory(tenantId, propertyId);
+}
+
+export async function getEstimationContext(
+  tenantId: string,
+  propertyId: string,
+  serviceCode: string,
+) {
+  const property = await repo.findById(tenantId, propertyId);
+  if (!property) throw new AppError(404, 'Property not found');
+  return serviceHistoryService.getEstimationContext(tenantId, propertyId, serviceCode, property as Record<string, unknown>);
+}
+
+export async function getCrewNotes(tenantId: string, propertyId: string) {
+  const existing = await repo.findById(tenantId, propertyId);
+  if (!existing) throw new AppError(404, 'Property not found');
+  return repo.findCrewNotes(tenantId, propertyId);
+}
+
+export async function addCrewNote(
+  tenantId: string,
+  propertyId: string,
+  input: AddCrewNoteInput,
+  userId: string,
+) {
+  const existing = await repo.findById(tenantId, propertyId);
+  if (!existing) throw new AppError(404, 'Property not found');
+  return repo.insertCrewNote(tenantId, propertyId, input.note, userId);
+}
+
+export async function getPropertyPhotos(tenantId: string, propertyId: string) {
+  const existing = await repo.findById(tenantId, propertyId);
+  if (!existing) throw new AppError(404, 'Property not found');
+  return repo.getPropertyPhotos(tenantId, propertyId);
+}
+
+export async function getJobHistory(tenantId: string, propertyId: string) {
+  const existing = await repo.findById(tenantId, propertyId);
+  if (!existing) throw new AppError(404, 'Property not found');
+  return repo.getJobHistory(tenantId, propertyId);
+}
+
+export async function getCategorySummary(tenantId: string) {
+  return repo.getCategorySummary(tenantId);
 }
