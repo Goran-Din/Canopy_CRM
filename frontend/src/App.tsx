@@ -58,6 +58,7 @@ import PortalJobsPage from './pages/portal/PortalJobsPage';
 import PortalInvoicesPage from './pages/portal/PortalInvoicesPage';
 import PortalInvoiceDetailPage from './pages/portal/PortalInvoiceDetailPage';
 import PortalPropertiesPage from './pages/portal/PortalPropertiesPage';
+import PortalFilesPage from './pages/portal/PortalFilesPage';
 import CrewLoginPage from './pages/crew-mobile/CrewLoginPage';
 import CrewDashboardPage from './pages/crew-mobile/CrewDashboardPage';
 import CrewJobDetailPage from './pages/crew-mobile/CrewJobDetailPage';
@@ -181,6 +182,7 @@ export default function App() {
           <Route path="/portal/invoices" element={<PortalInvoicesPage />} />
           <Route path="/portal/invoices/:id" element={<PortalInvoiceDetailPage />} />
           <Route path="/portal/properties" element={<PortalPropertiesPage />} />
+          <Route path="/portal/files" element={<PortalFilesPage />} />
         </Route>
 
         {/* Crew Mobile PWA */}

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { FileText, Briefcase, Receipt, Home, ArrowRight } from 'lucide-react';
+import { FileText, Briefcase, Receipt, Home, ArrowRight, FolderOpen } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -82,6 +82,17 @@ export default function PortalDashboardPage() {
             <div>
               <p className="text-2xl font-bold">{fmt(summary?.outstanding_balance ?? '0')}</p>
               <p className="text-sm text-muted-foreground">Outstanding Balance</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/portal/files')}>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <FolderOpen className="h-8 w-8 text-primary" />
+              <div>
+                <p className="font-semibold">Files</p>
+                <p className="text-sm text-muted-foreground">Documents & photos</p>
+              </div>
             </div>
           </CardContent>
         </Card>
