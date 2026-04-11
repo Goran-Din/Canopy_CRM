@@ -317,6 +317,10 @@ export async function getCrossCheckFlags(tenantId: string, input: CrossCheckFlag
   return repo.getCrossCheckFlags(tenantId, input);
 }
 
+export async function getTodayOfficeProperties(tenantId: string) {
+  return repo.getTodayProperties(tenantId);
+}
+
 export async function resolveCrossCheckFlag(
   eventId: string,
   tenantId: string,

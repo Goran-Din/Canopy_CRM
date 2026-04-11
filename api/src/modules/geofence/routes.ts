@@ -65,6 +65,15 @@ router.post('/v1/gps-events/cross-check-flags/:id/resolve',
   validate(resolveFlagSchema),
   ctrl.resolveCrossCheckFlag);
 
+// === Today Office Properties ===
+
+// GET /v1/geofence/today-office-properties
+router.get('/v1/geofence/today-office-properties',
+  authenticate,
+  tenantScope,
+  requireRole('owner', 'div_mgr', 'coordinator'),
+  ctrl.getTodayOfficeProperties);
+
 // === Property Geofence ===
 
 // GET /v1/properties/:id/geofence
