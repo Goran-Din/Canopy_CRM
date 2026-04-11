@@ -349,3 +349,200 @@ export async function customerExists(
   );
   return parseInt(result.rows[0].count, 10) > 0;
 }
+
+// --- V2 Functions ---
+
+/**
+ * Update property V2 profile fields.
+ */
+export async function updateProfile(
+  tenantId: string,
+  propertyId: string,
+  updates: Record<string, unknown>,
+): Promise<PropertyRow | null> {
+  const setClauses: string[] = [];
+  const params: unknown[] = [];
+  let paramIdx = 1;
+
+  const v2Fields = [
+    'property_category', 'property_description',
+    'bed_area_sqft', 'num_bushes_shrubs', 'num_trees',
+    'driveway_sqft', 'driveway_material', 'walkway_linear_ft', 'patio_sqft', 'parking_lot_sqft',
+    'snow_service_active', 'snow_plow_area_sqft', 'snow_salting_area_sqft', 'snow_hand_shoveling_sqft',
+    'entry_method', 'crew_parking', 'equipment_access', 'dogs_on_property', 'special_crew_instructions',
+  ];
+
+  for (const col of v2Fields) {
+    if (updates[col] !== undefined) {
+      setClauses.push(`${col} = $${paramIdx}`);
+      params.push(updates[col] ?? null);
+      paramIdx++;
+    }
+  }
+
+  if (setClauses.length === 0) return findById(tenantId, propertyId);
+
+  params.push(propertyId);
+  params.push(tenantId);
+
+  const result = await queryDb<PropertyRow>(
+    `UPDATE properties SET ${setClauses.join(', ')}
+     WHERE id = $${paramIdx - 1} AND tenant_id = $${paramIdx} AND deleted_at IS NULL
+     RETURNING *`,
+    params,
+  );
+  return result.rows[0] || null;
+}
+
+export interface KnowledgeCardData extends PropertyWithCustomer {
+  total_jobs: number;
+  contracts: unknown;
+}
+
+/**
+ * Get full knowledge card data.
+ */
+export async function getKnowledgeCard(
+  tenantId: string,
+  propertyId: string,
+): Promise<KnowledgeCardData | null> {
+  const result = await queryDb<KnowledgeCardData>(
+    `SELECT p.*,
+            c.display_name AS customer_display_name,
+            (SELECT COUNT(*)::int FROM jobs WHERE property_id = p.id AND deleted_at IS NULL) AS total_jobs,
+            (SELECT COALESCE(json_agg(json_build_object(
+              'id', sc.id, 'title', sc.title, 'status', sc.status, 'service_tier', sc.service_tier
+            )), '[]'::json) FROM service_contracts sc
+            WHERE sc.property_id = p.id AND sc.deleted_at IS NULL AND sc.status = 'active') AS contracts
+     FROM properties p
+     LEFT JOIN customers c ON p.customer_id = c.id AND c.deleted_at IS NULL
+     WHERE p.id = $1 AND p.tenant_id = $2 AND p.deleted_at IS NULL`,
+    [propertyId, tenantId],
+  );
+  return result.rows[0] || null;
+}
+
+/**
+ * Category summary (count by category).
+ */
+export async function getCategorySummary(tenantId: string): Promise<StatRow[]> {
+  const result = await queryDb<StatRow>(
+    `SELECT property_category AS label, COUNT(*)::text AS count
+     FROM properties
+     WHERE tenant_id = $1 AND deleted_at IS NULL AND property_category IS NOT NULL
+     GROUP BY property_category
+     ORDER BY property_category`,
+    [tenantId],
+  );
+  return result.rows;
+}
+
+export interface CrewNote {
+  id: string;
+  tenant_id: string;
+  property_id: string;
+  note: string;
+  created_by_user_id: string;
+  created_at: Date;
+}
+
+/**
+ * Insert crew field note (append-only).
+ */
+export async function insertCrewNote(
+  tenantId: string,
+  propertyId: string,
+  note: string,
+  userId: string,
+): Promise<CrewNote> {
+  // Store in job_diary_entries with entry_type = 'crew_field_note'
+  // Using property_service_history notes column is alternative, but diary is append-only
+  const result = await queryDb<CrewNote>(
+    `INSERT INTO job_diary_entries
+     (tenant_id, job_id, entry_type, title, body, metadata, created_by_user_id, is_system_entry)
+     SELECT $1, j.id, 'note_added', $3, $4,
+       json_build_object('property_id', $2, 'type', 'crew_field_note'),
+       $5, false
+     FROM jobs j
+     WHERE j.property_id = $2 AND j.tenant_id = $1 AND j.deleted_at IS NULL
+     ORDER BY j.created_at DESC LIMIT 1
+     RETURNING id, tenant_id, $2::uuid AS property_id, body AS note, created_by_user_id, created_at`,
+    [tenantId, propertyId, `Crew note: ${note.substring(0, 50)}`, note, userId],
+  );
+
+  // If no job found, insert a standalone record in property_service_history notes
+  if (!result.rows[0]) {
+    const fallback = await queryDb<CrewNote>(
+      `INSERT INTO property_service_history
+       (tenant_id, property_id, customer_id, service_code, service_name,
+        service_date, season_year, division, status, notes)
+       SELECT $1, $2, p.customer_id, 'CREW-NOTE', 'Crew Field Note',
+        CURRENT_DATE, EXTRACT(YEAR FROM CURRENT_DATE)::smallint, 'landscaping_maintenance', 'completed', $3
+       FROM properties p WHERE p.id = $2 AND p.tenant_id = $1
+       RETURNING id, tenant_id, property_id, notes AS note, NULL::uuid AS created_by_user_id, created_at`,
+      [tenantId, propertyId, note],
+    );
+    return fallback.rows[0];
+  }
+
+  return result.rows[0];
+}
+
+/**
+ * Get crew notes for a property (newest first).
+ */
+export async function findCrewNotes(
+  tenantId: string,
+  propertyId: string,
+): Promise<CrewNote[]> {
+  const result = await queryDb<CrewNote>(
+    `SELECT id, tenant_id, $2::uuid AS property_id, body AS note, created_by_user_id, created_at
+     FROM job_diary_entries
+     WHERE tenant_id = $1
+       AND metadata->>'property_id' = $2
+       AND metadata->>'type' = 'crew_field_note'
+     ORDER BY created_at DESC`,
+    [tenantId, propertyId],
+  );
+  return result.rows;
+}
+
+/**
+ * Get job history for a property.
+ */
+export async function getJobHistory(
+  tenantId: string,
+  propertyId: string,
+): Promise<unknown[]> {
+  const result = await queryDb(
+    `SELECT j.id, j.job_number, j.title, j.status, j.division,
+            j.scheduled_date, j.actual_start_time, j.actual_end_time,
+            j.assigned_crew_id, j.created_at
+     FROM jobs j
+     WHERE j.tenant_id = $1 AND j.property_id = $2 AND j.deleted_at IS NULL
+     ORDER BY j.scheduled_date DESC NULLS LAST, j.created_at DESC
+     LIMIT 50`,
+    [tenantId, propertyId],
+  );
+  return result.rows;
+}
+
+/**
+ * Get photos for a property (from job_photos V2 table).
+ */
+export async function getPropertyPhotos(
+  tenantId: string,
+  propertyId: string,
+): Promise<unknown[]> {
+  const result = await queryDb(
+    `SELECT jp.id, jp.photo_tag, jp.caption, jp.portal_visible,
+            jp.created_at, j.job_number, j.title AS job_title
+     FROM job_photos jp
+     JOIN jobs j ON jp.job_id = j.id
+     WHERE jp.tenant_id = $1 AND jp.property_id = $2 AND jp.deleted_at IS NULL
+     ORDER BY jp.created_at DESC
+     LIMIT 100`,
+    [tenantId, propertyId],
+  );
+  return result.rows;
+}

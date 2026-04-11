@@ -30,6 +30,12 @@ const envSchema = z.object({
   XERO_CLIENT_ID: z.string().optional(),
   XERO_CLIENT_SECRET: z.string().optional(),
   XERO_REDIRECT_URI: z.string().optional(),
+
+  // Cloudflare R2 (file storage)
+  R2_ENDPOINT: z.string().default(''),
+  R2_ACCESS_KEY_ID: z.string().default(''),
+  R2_SECRET_ACCESS_KEY: z.string().default(''),
+  R2_BUCKET_NAME: z.string().default('canopy-crm'),
 });
 
 const parsed = envSchema.safeParse(process.env);

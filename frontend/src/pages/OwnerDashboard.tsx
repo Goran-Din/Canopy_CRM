@@ -86,13 +86,15 @@ function StatCard({
 }
 
 function formatCurrency(amount: string | number | undefined | null): string {
-  const num = typeof amount === 'string' ? parseFloat(amount) : (amount ?? 0);
+  if (amount === null || amount === undefined || amount === '') return '$0';
+  const num = typeof amount === 'number' ? amount : parseFloat(amount);
+  if (isNaN(num)) return '$0';
   return new Intl.NumberFormat('en-CA', {
     style: 'currency',
     currency: 'CAD',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(isNaN(num) ? 0 : num);
+  }).format(num);
 }
 
 export default function OwnerDashboard() {

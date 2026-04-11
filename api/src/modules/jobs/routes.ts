@@ -15,7 +15,12 @@ import {
   createPhotoSchema,
   createChecklistSchema,
   updateChecklistSchema,
+  createJobV2Schema,
+  changeStatusSchema,
 } from './schema.js';
+import { addDiaryNoteSchema, diaryQuerySchema } from './diary/diary.schema.js';
+import { addPhotoSchema as addPhotoV2Schema, updatePhotoSchema, photoParamsSchema } from './photos/photos.schema.js';
+import { upsertBadgeSchema, assignBadgesSchema } from './badges/badges.schema.js';
 import * as ctrl from './controller.js';
 
 const router = Router();
@@ -51,6 +56,28 @@ router.put(
   validate(checklistItemParamsSchema, 'params'),
   validate(updateChecklistSchema),
   ctrl.updateChecklistItem,
+);
+
+// V2 Badges (static routes before :id)
+router.get(
+  '/v1/jobs/badges',
+  requireRole('owner', 'div_mgr', 'coordinator'),
+  ctrl.listBadges,
+);
+
+router.post(
+  '/v1/jobs/badges',
+  requireRole('owner', 'div_mgr'),
+  validate(upsertBadgeSchema),
+  ctrl.upsertBadge,
+);
+
+// V2 Job creation (static route before :id)
+router.post(
+  '/v1/jobs/v2',
+  requireRole('owner', 'div_mgr', 'coordinator'),
+  validate(createJobV2Schema),
+  ctrl.createJobV2,
 );
 
 // Job CRUD
@@ -128,6 +155,84 @@ router.get(
   requireRole('owner', 'div_mgr', 'coordinator', 'crew_leader', 'crew_member'),
   validate(jobParamsSchema, 'params'),
   ctrl.getChecklist,
+);
+
+// ============================================
+// V2 Routes
+// ============================================
+
+// V2 Status change (with diary entry)
+router.post(
+  '/v1/jobs/:id/status',
+  requireRole('owner', 'div_mgr', 'coordinator', 'crew_leader', 'crew_member'),
+  validate(jobParamsSchema, 'params'),
+  validate(changeStatusSchema),
+  ctrl.changeStatusV2,
+);
+
+// Convert assessment to work order
+router.post(
+  '/v1/jobs/:id/convert-to-wo',
+  requireRole('owner', 'div_mgr', 'coordinator'),
+  validate(jobParamsSchema, 'params'),
+  ctrl.convertToWorkOrder,
+);
+
+// Diary
+router.get(
+  '/v1/jobs/:id/diary',
+  requireRole('owner', 'div_mgr', 'coordinator', 'crew_leader', 'crew_member'),
+  validate(jobParamsSchema, 'params'),
+  validate(diaryQuerySchema, 'query'),
+  ctrl.listDiaryEntries,
+);
+
+router.post(
+  '/v1/jobs/:id/diary',
+  requireRole('owner', 'div_mgr', 'coordinator', 'crew_leader', 'crew_member'),
+  validate(jobParamsSchema, 'params'),
+  validate(addDiaryNoteSchema),
+  ctrl.addDiaryNote,
+);
+
+// V2 Photos
+router.get(
+  '/v1/jobs/:id/photos/v2',
+  requireRole('owner', 'div_mgr', 'coordinator', 'crew_leader', 'crew_member'),
+  validate(jobParamsSchema, 'params'),
+  ctrl.listPhotosV2,
+);
+
+router.post(
+  '/v1/jobs/:id/photos/v2',
+  requireRole('owner', 'div_mgr', 'coordinator', 'crew_leader', 'crew_member'),
+  validate(jobParamsSchema, 'params'),
+  validate(addPhotoV2Schema),
+  ctrl.addPhotoV2,
+);
+
+router.patch(
+  '/v1/jobs/:id/photos/:photoId',
+  requireRole('owner', 'div_mgr', 'coordinator'),
+  validate(photoParamsSchema, 'params'),
+  validate(updatePhotoSchema),
+  ctrl.updatePhotoV2,
+);
+
+router.delete(
+  '/v1/jobs/:id/photos/:photoId',
+  requireRole('owner', 'div_mgr', 'coordinator'),
+  validate(photoParamsSchema, 'params'),
+  ctrl.deletePhotoV2,
+);
+
+// Badge assignment (per job)
+router.post(
+  '/v1/jobs/:id/badges',
+  requireRole('owner', 'div_mgr', 'coordinator'),
+  validate(jobParamsSchema, 'params'),
+  validate(assignBadgesSchema),
+  ctrl.assignBadges,
 );
 
 export default router;

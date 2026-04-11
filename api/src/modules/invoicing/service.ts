@@ -431,8 +431,8 @@ export async function generateFromJobs(
 
 // --- Stats ---
 
-export async function getInvoiceStats(tenantId: string) {
-  return repo.getStats(tenantId);
+export async function getInvoiceStats(tenantId: string, divisionId?: string) {
+  return repo.getStats(tenantId, divisionId);
 }
 
 export async function getAgingReport(tenantId: string) {

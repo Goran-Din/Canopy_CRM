@@ -145,3 +145,59 @@ export function mapCreditNoteToXeroCreditNote(
     CurrencyCode: 'CAD',
   };
 }
+
+// === V2: Recurring Invoice Item Code Mapping ===
+
+const ITEM_CODE_MAP: Record<string, string> = {
+  gold: '4210-COMM-001',
+  silver: '4210-COMM-001',
+  bronze_per_cut: '4210-MAINT-001',
+  bronze_flat_monthly: '4210-MAINT-001',
+  snow_seasonal: '4350-SNOW-002',
+  snow_per_event_plow: '4350-SNOW-002',
+  snow_per_event_salt: '4350-SNOW-005',
+  snow_calcium: '4260-MAT-006',
+};
+
+export function mapInvoiceToXeroLineItem(
+  lineItem: Record<string, unknown>,
+  invoiceType: string,
+): { ItemCode: string; Description: string; Quantity: number; UnitAmount: number; AccountCode: string; TaxType: string } {
+  const itemCode = ITEM_CODE_MAP[invoiceType]
+    ?? (lineItem.xero_item_code as string)
+    ?? '4210-MAINT-001';
+
+  return {
+    ItemCode: itemCode,
+    Description: (lineItem.description as string) || '',
+    Quantity: Number(lineItem.quantity) || 1,
+    UnitAmount: Number(lineItem.unit_price) || 0,
+    AccountCode: '200',
+    TaxType: 'OUTPUT',
+  };
+}
+
+export function buildXeroReference(
+  invoiceType: string,
+  meta: Record<string, unknown>,
+): string {
+  const jobNumber = meta.job_number ? `Job #${meta.job_number}` : '';
+
+  switch (invoiceType) {
+    case 'gold':
+    case 'silver':
+      return `Canopy CRM — Invoice ${meta.invoice_number_in_season ?? ''} of ${meta.total_invoices ?? 8} — Season ${meta.year ?? ''}`;
+    case 'bronze_per_cut':
+      return `Canopy CRM — Weekly Mowing — ${meta.month ?? ''}`;
+    case 'bronze_flat_monthly':
+      return `Canopy CRM — Monthly Lawn Mowing — ${meta.month ?? ''}`;
+    case 'snow_seasonal':
+      return `Canopy CRM — Snow Service — ${meta.month ?? ''}`;
+    case 'landscape_project':
+      return `Canopy CRM — ${jobNumber}`;
+    case 'hardscape_milestone':
+      return `Canopy CRM — ${meta.milestone_name ?? ''} — ${jobNumber}`;
+    default:
+      return `Canopy CRM — ${jobNumber || meta.description || ''}`;
+  }
+}

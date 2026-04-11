@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const jobTypes = ['scheduled_service', 'one_time', 'emergency', 'inspection', 'estimate'] as const;
-const jobStatuses = ['unscheduled', 'scheduled', 'in_progress', 'completed', 'verified', 'cancelled', 'skipped'] as const;
+const jobStatuses = ['unscheduled', 'scheduled', 'in_progress', 'completed', 'verified', 'cancelled', 'skipped', 'quote', 'assessment'] as const;
 const jobPriorities = ['low', 'normal', 'high', 'urgent'] as const;
 const photoTypes = ['before', 'during', 'after', 'issue'] as const;
 const divisionTypes = ['landscaping_maintenance', 'landscaping_projects', 'hardscape', 'snow_removal'] as const;
@@ -129,3 +129,35 @@ export const updateChecklistSchema = z.object({
 });
 
 export type UpdateChecklistInput = z.infer<typeof updateChecklistSchema>;
+
+// --- V2 Schemas ---
+
+const creationPaths = ['quote', 'instant_work_order', 'assessment'] as const;
+
+export const createJobV2Schema = z.object({
+  contract_id: z.string().uuid('Invalid contract ID').nullish(),
+  customer_id: z.string().uuid('Invalid customer ID'),
+  property_id: z.string().uuid('Invalid property ID'),
+  division: z.enum(divisionTypes),
+  job_type: z.enum(jobTypes).default('scheduled_service'),
+  creation_path: z.enum(creationPaths),
+  title: z.string().min(1, 'Title is required').max(255),
+  description: z.string().nullish(),
+  scheduled_date: z.string().nullish(),
+  scheduled_start_time: z.string().nullish(),
+  estimated_duration_minutes: z.coerce.number().int().min(0).nullish(),
+  priority: z.enum(jobPriorities).default('normal'),
+  assigned_crew_id: z.string().uuid().nullish(),
+  assigned_to: z.string().uuid().nullish(),
+  notes: z.string().nullish(),
+  requires_photos: z.boolean().default(false),
+  weather_condition: z.string().max(100).nullish(),
+  tags: z.array(z.string()).default([]),
+});
+
+export type CreateJobV2Input = z.infer<typeof createJobV2Schema>;
+
+export const changeStatusSchema = z.object({
+  status: z.enum(jobStatuses),
+  completion_notes: z.string().nullish(),
+});

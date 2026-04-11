@@ -9,6 +9,9 @@ import {
   propertyQuerySchema,
   propertyParamsSchema,
   customerParamsSchema,
+  updatePropertyProfileSchema,
+  estimationQuerySchema,
+  addCrewNoteSchema,
 } from './schema.js';
 import * as ctrl from './controller.js';
 
@@ -22,6 +25,12 @@ router.get(
   '/v1/properties/stats',
   requireRole('owner', 'div_mgr'),
   ctrl.getStats,
+);
+
+// Category summary (static route before :id)
+router.get(
+  '/v1/properties/categories/summary',
+  ctrl.getCategorySummary,
 );
 
 // By-customer must be before :id to avoid matching "by-customer" as UUID
@@ -66,6 +75,63 @@ router.delete(
   requireRole('owner'),
   validate(propertyParamsSchema, 'params'),
   ctrl.deleteProperty,
+);
+
+// ============================================
+// V2 Routes — Property Knowledge Card
+// ============================================
+
+router.get(
+  '/v1/properties/:id/knowledge-card',
+  validate(propertyParamsSchema, 'params'),
+  ctrl.getKnowledgeCard,
+);
+
+router.patch(
+  '/v1/properties/:id/profile',
+  requireRole('owner', 'div_mgr', 'coordinator'),
+  validate(propertyParamsSchema, 'params'),
+  validate(updatePropertyProfileSchema),
+  ctrl.updateProfile,
+);
+
+router.get(
+  '/v1/properties/:id/service-history',
+  validate(propertyParamsSchema, 'params'),
+  ctrl.getServiceHistory,
+);
+
+router.get(
+  '/v1/properties/:id/estimation-context',
+  requireRole('owner', 'div_mgr', 'coordinator'),
+  validate(propertyParamsSchema, 'params'),
+  validate(estimationQuerySchema, 'query'),
+  ctrl.getEstimationContext,
+);
+
+router.get(
+  '/v1/properties/:id/crew-notes',
+  validate(propertyParamsSchema, 'params'),
+  ctrl.getCrewNotes,
+);
+
+router.post(
+  '/v1/properties/:id/crew-notes',
+  validate(propertyParamsSchema, 'params'),
+  validate(addCrewNoteSchema),
+  ctrl.addCrewNote,
+);
+
+router.get(
+  '/v1/properties/:id/photos',
+  validate(propertyParamsSchema, 'params'),
+  ctrl.getPropertyPhotos,
+);
+
+router.get(
+  '/v1/properties/:id/job-history',
+  validate(propertyParamsSchema, 'params'),
+  ctrl.getJobHistory,
 );
 
 export default router;
