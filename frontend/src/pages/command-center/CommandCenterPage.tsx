@@ -108,7 +108,7 @@ export default function CommandCenterPage() {
 
       {/* Main panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CrewDispatchPanel crewPositions={crewPositions} />
+        <CrewDispatchPanel crewPositions={crewPositions} summary={summary ?? undefined} />
         <div className="space-y-6">
           <BillingQueuePanel drafts={drafts} overdue={overdue} />
           <SeasonProgressPanel seasonData={seasonData} />
