@@ -63,6 +63,13 @@ export async function getCrossCheckFlags(req: Request, res: Response, next: Next
   } catch (err) { next(err); }
 }
 
+export async function getTodayOfficeProperties(req: Request, res: Response, next: NextFunction) {
+  try {
+    const properties = await geofenceService.getTodayOfficeProperties(req.tenantId!);
+    res.json({ status: 'success', data: { properties } });
+  } catch (err) { next(err); }
+}
+
 export async function resolveCrossCheckFlag(req: Request, res: Response, next: NextFunction) {
   try {
     const data = await geofenceService.resolveCrossCheckFlag(

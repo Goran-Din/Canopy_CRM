@@ -389,6 +389,46 @@ export async function findDeparturesForDay(
   return result.rows;
 }
 
+export interface TodayPropertyRow {
+  property_id: string;
+  address: string;
+  lat: number;
+  lng: number;
+  geofence_radius_metres: number;
+  job_id: string;
+  job_number: string | null;
+  crew_name: string | null;
+  scheduled_date: string;
+}
+
+export async function getTodayProperties(tenantId: string): Promise<TodayPropertyRow[]> {
+  const result = await queryDb<TodayPropertyRow>(
+    `SELECT DISTINCT ON (p.id)
+       p.id AS property_id,
+       COALESCE(p.address_line1, '') || ', ' || COALESCE(p.city, '') || ' ' || COALESCE(p.state, '') AS address,
+       p.geofence_lat AS lat,
+       p.geofence_lng AS lng,
+       p.geofence_radius_metres,
+       j.id AS job_id,
+       j.job_number,
+       c.crew_name,
+       j.scheduled_date::text AS scheduled_date
+     FROM properties p
+     JOIN jobs j ON j.property_id = p.id AND j.tenant_id = $1
+     LEFT JOIN crews c ON c.id = j.assigned_crew_id
+     WHERE p.tenant_id = $1
+       AND p.deleted_at IS NULL
+       AND j.deleted_at IS NULL
+       AND j.scheduled_date = CURRENT_DATE
+       AND j.status NOT IN ('cancelled', 'completed')
+       AND p.geofence_lat IS NOT NULL
+       AND p.geofence_lng IS NOT NULL
+     ORDER BY p.id, j.scheduled_date`,
+    [tenantId],
+  );
+  return result.rows;
+}
+
 export async function updateGpsEvent(
   eventId: string,
   data: Record<string, unknown>,
