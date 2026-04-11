@@ -49,7 +49,7 @@ function fmt(v: number | string | null): string {
 
 export function QuoteTab({ jobId, quoteId }: QuoteTabProps) {
   const { data: quote, refetch } = useApiGet<QuoteDetail>(
-    ['quote', quoteId],
+    ['quote', quoteId ?? ''],
     `/v1/quotes/${quoteId}`,
     undefined,
     { enabled: !!quoteId },

@@ -9,7 +9,7 @@ interface FilesTabProps {
   customerId: string;
 }
 
-export function FilesTab({ jobId, customerId }: FilesTabProps) {
+export function FilesTab({ jobId: _jobId, customerId }: FilesTabProps) {
   const [uploadOpen, setUploadOpen] = useState(false);
 
   return (
