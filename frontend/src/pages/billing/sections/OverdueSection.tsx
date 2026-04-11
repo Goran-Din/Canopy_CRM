@@ -39,7 +39,7 @@ export function OverdueSection() {
   const { data: invoices = [], refetch } = useApiGet<OverdueInvoice[]>(['billing-overdue'], '/v1/billing/overdue');
 
   const remindMut = useApiMutation<void, { invoice_id: string }>('post', '/v1/billing/remind', []);
-  const escalateMut = useApiMutation<void, { note: string }>('patch', (vars) => `/v1/invoices/${escalateId}`, [['billing-overdue']]);
+  const escalateMut = useApiMutation<void, { note: string }>('patch', () => `/v1/invoices/${escalateId}`, [['billing-overdue']]);
 
   const handleRemind = async (invoiceId: string) => {
     try {

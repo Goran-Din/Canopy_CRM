@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
-import { useApiGet, useApiMutation } from '@/hooks/useApi';
+import { useApiGet } from '@/hooks/useApi';
 import { toast } from 'sonner';
 import { InvoiceReviewPanel } from '../components/InvoiceReviewPanel';
 
@@ -18,16 +18,11 @@ function fmt(v: string | number): string {
 export function DraftsSection() {
   const [reviewId, setReviewId] = useState<string | null>(null);
   const [confirmApproveAll, setConfirmApproveAll] = useState(false);
-  const [approving, setApproving] = useState(false);
-
   const { data: drafts = [], refetch } = useApiGet<Draft[]>(['billing-drafts'], '/v1/billing/drafts');
-
-  const approveMut = useApiMutation<void, void>('post', '/v1/billing/drafts/placeholder/approve', [['billing-drafts'], ['billing-dashboard']]);
 
   const total = drafts.reduce((s, d) => s + parseFloat(d.amount || '0'), 0);
 
   const handleApproveAll = async () => {
-    setApproving(true);
     let count = 0;
     for (const draft of drafts) {
       try {
@@ -38,7 +33,6 @@ export function DraftsSection() {
     }
     toast.success(`${count} invoice${count !== 1 ? 's' : ''} approved`);
     setConfirmApproveAll(false);
-    setApproving(false);
     refetch();
   };
 
