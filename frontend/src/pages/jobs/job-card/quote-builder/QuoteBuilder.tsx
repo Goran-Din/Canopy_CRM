@@ -49,7 +49,7 @@ interface QuoteBuilderProps {
 
 export default function QuoteBuilder({
   quoteId,
-  jobId,
+  jobId: _jobId,
   customerEmail,
   customerPhone,
   propertyAddress,
@@ -88,12 +88,6 @@ export default function QuoteBuilder({
   const addSection = useApiMutation<void, { title: string }>(
     'post',
     `/v1/quotes/${quoteId}/sections`,
-    [['quote', quoteId]],
-  );
-
-  const patchSectionMut = useApiMutation<void, Record<string, unknown>>(
-    'patch',
-    `/v1/quotes/${quoteId}/sections/placeholder`,
     [['quote', quoteId]],
   );
 

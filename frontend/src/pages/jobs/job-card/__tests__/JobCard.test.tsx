@@ -30,6 +30,19 @@ vi.mock('@/components/shared/ConfirmDialog', () => ({
   ConfirmDialog: ({ open, onConfirm }: { open: boolean; onConfirm: () => void }) =>
     open ? <div data-testid="confirm-dialog"><button onClick={onConfirm}>Confirm</button></div> : null,
 }));
+vi.mock('@dnd-kit/core', () => ({
+  DndContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  closestCenter: vi.fn(),
+  PointerSensor: vi.fn(),
+  KeyboardSensor: vi.fn(),
+  useSensor: vi.fn(),
+  useSensors: vi.fn(() => []),
+}));
+vi.mock('@dnd-kit/sortable', () => ({
+  SortableContext: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  verticalListSortingStrategy: {},
+  useSortable: () => ({ attributes: {}, listeners: {}, setNodeRef: vi.fn(), transform: null, transition: null }),
+}));
 vi.mock('@/components/files/PhotoGrid', () => ({ PhotoGrid: () => <div data-testid="photo-grid">PhotoGrid</div> }));
 vi.mock('@/components/files/FileList', () => ({ FileList: () => <div data-testid="file-list">FileList</div> }));
 vi.mock('@/components/files/FileUploadDialog', () => ({ FileUploadDialog: () => null }));
@@ -196,14 +209,15 @@ describe('JobCard', () => {
     expect(screen.getByText('Create Quote')).toBeInTheDocument();
   });
 
-  it('quote tab shows placeholder for draft quote', () => {
+  it('quote tab renders QuoteBuilder for draft quote', () => {
     mockUseApiGet.mockImplementation((key: string[]) => {
       if (key[0] === 'job') return { data: { ...mockJob, quote_id: 'q1' }, isLoading: false, refetch: mockRefetch };
-      if (key[0] === 'quote') return { data: { id: 'q1', quote_number: 'Q-0047-01', status: 'draft', total: '500', sections: [], versions: [] }, refetch: mockRefetch };
+      if (key[0] === 'quote') return { data: { id: 'q1', quote_number: 'Q-0047-01', status: 'draft', version_number: 1, total: '500', subtotal: 0, discount_amount: 0, tax_enabled: false, tax_rate: 0, client_notes: null, payment_terms: null, valid_until: null, pdf_file_id: null, sections: [], versions: [] }, refetch: mockRefetch };
+      if (key[0] === 'quote-templates') return { data: [], refetch: mockRefetch };
       return { data: null, isLoading: false, refetch: mockRefetch };
     });
     renderJobCard('/jobs/j1/quote');
-    expect(screen.getByText(/Quote Builder will be rendered here/)).toBeInTheDocument();
+    expect(screen.getByText('Q-0047-01')).toBeInTheDocument();
   });
 
   it('back button navigates to previous page', async () => {

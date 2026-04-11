@@ -205,8 +205,8 @@ describe('QuoteBuilder', () => {
     setupMocks({
       sections: [{
         id: 's1', title: 'Empty', body: null, sort_order: 0,
-        line_items: [{ id: 'li1', item_name: 'X', description: '', quantity: 1, unit: 'ea', unit_price: null, line_total: 0, sort_order: 0, xero_item_code: null, xero_default_price: null }],
-      }],
+        line_items: [{ id: 'li1', item_name: 'X', description: '', quantity: 1, unit: 'ea', unit_price: null as unknown as number, line_total: 0, sort_order: 0, xero_item_code: null as unknown as string, xero_default_price: null as unknown as number }],
+      }] as typeof mockQuote.sections,
     });
     renderBuilder();
     await userEvent.click(screen.getByText('Generate & Send'));

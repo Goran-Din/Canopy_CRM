@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { GripVertical, Plus, X } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/sortable';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -31,7 +30,10 @@ export function SectionEditor({ section, quoteId, onUpdate, onDelete }: SectionE
   const [showConfirm, setShowConfirm] = useState(false);
 
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: section.id });
-  const style = { transform: CSS.Transform.toString(transform), transition };
+  const style: React.CSSProperties = {
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    transition: transition ?? undefined,
+  };
 
   const patchSection = useApiMutation<void, Record<string, unknown>>(
     'patch', `/v1/quotes/${quoteId}/sections/${section.id}`, [['quote', quoteId]],
