@@ -66,6 +66,12 @@ const navSections: NavSection[] = [
         icon: LayoutGrid,
         roles: ['owner', 'div_mgr', 'coordinator'],
       },
+      {
+        label: 'Live Map',
+        href: '/live-map',
+        icon: MapPin,
+        roles: ['owner', 'div_mgr', 'coordinator'],
+      },
       { label: 'Time Tracking', href: '/time-tracking', icon: Clock },
     ],
   },
