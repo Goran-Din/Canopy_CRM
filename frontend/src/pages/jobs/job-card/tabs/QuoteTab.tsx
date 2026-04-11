@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { useApiGet, useApiMutation } from '@/hooks/useApi';
 import { toast } from 'sonner';
+import QuoteBuilder from '../quote-builder/QuoteBuilder';
 
 interface QuoteVersion {
   id: string;
@@ -86,9 +87,8 @@ export function QuoteTab({ jobId, quoteId }: QuoteTabProps) {
 
   if (quote.status === 'draft') {
     return (
-      <div className="mt-4 p-8 border-2 border-dashed rounded-lg text-center">
-        <p className="text-muted-foreground">Quote Builder will be rendered here.</p>
-        <p className="text-xs text-muted-foreground mt-1">Status: Draft — {quote.quote_number}</p>
+      <div className="mt-4">
+        <QuoteBuilder quoteId={quote.id} jobId={jobId} onSent={refetch} />
       </div>
     );
   }
