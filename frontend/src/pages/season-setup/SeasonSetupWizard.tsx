@@ -103,7 +103,7 @@ export default function SeasonSetupWizard() {
   const handleActivate = async () => {
     setIsActivating(true);
     try {
-      const result = await activateMut.mutateAsync(wizardData);
+      await activateMut.mutateAsync(wizardData);
       toast.success('Season activated successfully!');
       setTimeout(() => navigate(`/contracts/${contractId}`), 2000);
     } catch (err: unknown) {
