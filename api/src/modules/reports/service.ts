@@ -1,4 +1,5 @@
 import * as repo from './repository.js';
+import { AppError } from '../../middleware/errorHandler.js';
 import type {
   ReportQuery,
   RevenueByCustomerQuery,
@@ -9,6 +10,10 @@ import type {
   OccurrenceStatusQuery,
   SkippedVisitsQuery,
   TierPerformanceQuery,
+  PropertyVisitHistoryQuery,
+  PayrollCrossCheckQuery,
+  ServiceVerificationQuery,
+  RoutePerformanceQuery,
 } from './schema.js';
 
 export async function getRevenueSummary(tenantId: string, query: ReportQuery) {
@@ -191,4 +196,88 @@ export async function getTierPerformance(tenantId: string, query: TierPerformanc
     rows,
     totals,
   };
+}
+
+// ============================================
+// Wave 7 Brief 05 — GPS Analytics (I-3 v2)
+// ============================================
+
+export async function getPropertyVisitHistory(
+  tenantId: string,
+  query: PropertyVisitHistoryQuery,
+) {
+  const { rows, summary } = await repo.getPropertyVisitHistory(tenantId, query.property_id, {
+    from_date: query.from_date,
+    to_date: query.to_date,
+    crew_member_id: query.crew_member_id,
+    verified_only: query.verified_only,
+  });
+  return { property_id: query.property_id, summary, rows };
+}
+
+export async function getPayrollCrossCheck(
+  tenantId: string,
+  query: PayrollCrossCheckQuery,
+) {
+  const rows = await repo.getPayrollCrossCheck(
+    tenantId, query.from_date, query.to_date,
+    { user_id: query.user_id, status: query.status },
+  );
+  const totals = {
+    days_reviewed: rows.length,
+    flagged_count: rows.filter((r) => r.status === 'flagged').length,
+    consistent_count: rows.filter((r) => r.status === 'consistent').length,
+  };
+  return { totals, rows };
+}
+
+export async function resolvePayrollCrossCheck(
+  tenantId: string,
+  gpsEventId: string,
+  note: string,
+) {
+  const ok = await repo.resolvePayrollCrossCheck(tenantId, gpsEventId, note);
+  if (!ok) throw new AppError(404, 'GPS event not found');
+  return { status: 'reviewed', gps_event_id: gpsEventId, note };
+}
+
+export async function getServiceVerification(
+  tenantId: string,
+  query: ServiceVerificationQuery,
+) {
+  const rows = await repo.getServiceVerification(tenantId, query.season_year, {
+    service_code: query.service_code,
+    tier: query.tier,
+    verification: query.verification,
+    crew_member_id: query.crew_member_id,
+    from_date: query.from_date,
+    to_date: query.to_date,
+  });
+  const totals = {
+    total: rows.length,
+    verified: rows.filter((r) => r.verification_status === 'verified').length,
+    unverified: rows.filter((r) => r.verification_status === 'unverified').length,
+    no_gps: rows.filter((r) => r.verification_status === 'no_gps').length,
+    verification_rate:
+      rows.length > 0
+        ? Math.round(
+          (rows.filter((r) => r.verification_status === 'verified').length / rows.length) * 1000,
+        ) / 10
+        : 0,
+  };
+  return { totals, rows };
+}
+
+export async function getRoutePerformance(
+  tenantId: string,
+  query: RoutePerformanceQuery,
+) {
+  const rows = await repo.getRoutePerformance(tenantId, {
+    from_date: query.from_date,
+    to_date: query.to_date,
+    min_visit_count: query.min_visit_count,
+    division: query.division,
+    crew_id: query.crew_id,
+  });
+  return { rows };
 }

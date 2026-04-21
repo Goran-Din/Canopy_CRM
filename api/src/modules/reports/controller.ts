@@ -178,3 +178,84 @@ export async function tierPerformance(req: Request, res: Response, next: NextFun
   } catch (err) { next(err); }
 }
 
+// ============================================
+// Wave 7 Brief 05 — GPS Analytics
+// ============================================
+
+export async function propertyVisitHistory(req: Request, res: Response, next: NextFunction) {
+  try {
+    const q = req.query as Record<string, unknown>;
+    const data = await reportService.getPropertyVisitHistory(req.tenantId!, q as never);
+    if (q.format === 'csv') {
+      const csv = rowsToCsv(data.rows, [
+        'arrival_at', 'departure_at', 'time_on_site_minutes', 'crew_member',
+        'job_number', 'verification_status', 'distance_from_centre_at_departure',
+      ]);
+      return sendCsv(res, `property-visits-${data.property_id}.csv`, csv);
+    }
+    res.json({ status: 'success', data });
+  } catch (err) { next(err); }
+}
+
+/**
+ * Payroll cross-check.
+ *
+ * INFORMATIONAL ONLY. Payroll is always calculated from clocked time entries.
+ * The Resolve action records a supervisor note and does not adjust pay.
+ */
+export async function payrollCrossCheck(req: Request, res: Response, next: NextFunction) {
+  try {
+    const q = req.query as Record<string, unknown>;
+    const data = await reportService.getPayrollCrossCheck(req.tenantId!, q as never);
+    if (q.format === 'csv') {
+      const csv = rowsToCsv(data.rows, [
+        'work_date', 'crew_member', 'layer1_minutes', 'layer2_minutes',
+        'diff_minutes', 'diff_pct', 'properties_visited', 'status',
+      ]);
+      return sendCsv(res, `payroll-cross-check-${q.from_date}-to-${q.to_date}.csv`, csv);
+    }
+    res.json({ status: 'success', data });
+  } catch (err) { next(err); }
+}
+
+export async function resolvePayrollCrossCheck(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await reportService.resolvePayrollCrossCheck(
+      req.tenantId!,
+      req.params.gps_event_id,
+      req.body.note,
+    );
+    res.json({ status: 'success', data });
+  } catch (err) { next(err); }
+}
+
+export async function serviceVerification(req: Request, res: Response, next: NextFunction) {
+  try {
+    const q = req.query as Record<string, unknown>;
+    const data = await reportService.getServiceVerification(req.tenantId!, q as never);
+    if (q.format === 'csv') {
+      const csv = rowsToCsv(data.rows, [
+        'occurrence_id', 'customer_name', 'street_address', 'service_code',
+        'service_name', 'occurrence_label', 'assigned_date', 'job_number',
+        'verification_status', 'time_on_site_minutes', 'crew_member', 'service_tier',
+      ]);
+      return sendCsv(res, `service-verification-${q.season_year ?? 'current'}.csv`, csv);
+    }
+    res.json({ status: 'success', data });
+  } catch (err) { next(err); }
+}
+
+export async function routePerformance(req: Request, res: Response, next: NextFunction) {
+  try {
+    const q = req.query as Record<string, unknown>;
+    const data = await reportService.getRoutePerformance(req.tenantId!, q as never);
+    if (q.format === 'csv') {
+      const csv = rowsToCsv(data.rows, [
+        'property_id', 'street_address', 'property_category', 'estimated_duration_minutes',
+        'avg_actual', 'variance_minutes', 'variance_pct', 'visit_count', 'trend',
+      ]);
+      return sendCsv(res, `route-performance.csv`, csv);
+    }
+    res.json({ status: 'success', data });
+  } catch (err) { next(err); }
+}

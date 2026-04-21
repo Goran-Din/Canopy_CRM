@@ -13,6 +13,12 @@ import {
   occurrenceStatusQuerySchema,
   skippedVisitsQuerySchema,
   tierPerformanceQuerySchema,
+  propertyVisitHistoryQuerySchema,
+  payrollCrossCheckQuerySchema,
+  resolveCrossCheckSchema,
+  gpsEventIdParamsSchema,
+  serviceVerificationQuerySchema,
+  routePerformanceQuerySchema,
 } from './schema.js';
 import * as ctrl from './controller.js';
 
@@ -57,6 +63,56 @@ router.get(
   requireRole('owner'),
   validate(tierPerformanceQuerySchema, 'query'),
   ctrl.tierPerformance,
+);
+
+// ============================================
+// Wave 7 Brief 05 — GPS Analytics (I-3 v2)
+// Registered before the global router.use so we can set per-route roles.
+// ============================================
+router.get(
+  '/v1/reports/property-visit-history',
+  authenticate,
+  tenantScope,
+  requireRole('owner', 'div_mgr', 'coordinator'),
+  validate(propertyVisitHistoryQuerySchema, 'query'),
+  ctrl.propertyVisitHistory,
+);
+
+router.get(
+  '/v1/reports/payroll-cross-check',
+  authenticate,
+  tenantScope,
+  requireRole('owner'),
+  validate(payrollCrossCheckQuerySchema, 'query'),
+  ctrl.payrollCrossCheck,
+);
+
+router.post(
+  '/v1/reports/payroll-cross-check/:gps_event_id/resolve',
+  authenticate,
+  tenantScope,
+  requireRole('owner'),
+  validate(gpsEventIdParamsSchema, 'params'),
+  validate(resolveCrossCheckSchema),
+  ctrl.resolvePayrollCrossCheck,
+);
+
+router.get(
+  '/v1/reports/service-verification',
+  authenticate,
+  tenantScope,
+  requireRole('owner', 'div_mgr', 'coordinator'),
+  validate(serviceVerificationQuerySchema, 'query'),
+  ctrl.serviceVerification,
+);
+
+router.get(
+  '/v1/reports/route-performance',
+  authenticate,
+  tenantScope,
+  requireRole('owner', 'div_mgr'),
+  validate(routePerformanceQuerySchema, 'query'),
+  ctrl.routePerformance,
 );
 
 // ============================================
