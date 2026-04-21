@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PropertyVisitHistoryView } from '@/pages/reports/PropertyVisitHistoryView';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -277,6 +278,7 @@ export default function PropertyDetailPage() {
               <TabsTrigger value="contracts">
                 Contracts ({contractsResult?.data.length ?? 0})
               </TabsTrigger>
+              <TabsTrigger value="gps-visits">GPS Visits</TabsTrigger>
             </TabsList>
 
             <TabsContent value="jobs" className="mt-4">
@@ -293,6 +295,10 @@ export default function PropertyDetailPage() {
                 data={contractsResult?.data ?? []}
                 emptyMessage="No contracts for this property."
               />
+            </TabsContent>
+
+            <TabsContent value="gps-visits" className="mt-4">
+              <PropertyVisitHistoryView propertyId={property.id} />
             </TabsContent>
           </Tabs>
         </div>

@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { RefreshCw, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/stores/authStore';
 import { useApiGet } from '@/hooks/useApi';
@@ -9,6 +11,7 @@ import { CrewDispatchPanel } from './panels/CrewDispatchPanel';
 import { BillingQueuePanel } from './panels/BillingQueuePanel';
 import { SeasonProgressPanel } from './panels/SeasonProgressPanel';
 import { RecentFeedbackPanel } from './panels/RecentFeedbackPanel';
+import type { PayrollCrossCheckResponse, ServiceVerificationResponse } from '@/api/reports-v2';
 
 interface CommandCenterSummary {
   crews_active: number; crews_not_in: number;
@@ -28,9 +31,26 @@ function getGreeting(): string {
   return 'Good Evening';
 }
 
+function isoDate(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
+function currentWeekRange(): { from: string; to: string } {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((day + 6) % 7));
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  return { from: isoDate(monday), to: isoDate(sunday) };
+}
+
 export default function CommandCenterPage() {
   const user = useAuthStore((s) => s.user);
+  const isOwner = user?.roles.some((r) => r.role === 'owner') ?? false;
   const [currentTime, setCurrentTime] = useState(new Date());
+  const today = useMemo(() => isoDate(new Date()), []);
+  const week = useMemo(currentWeekRange, []);
 
   useEffect(() => {
     const tick = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -59,6 +79,23 @@ export default function CommandCenterPage() {
 
   const { data: feedbackData } = useApiGet<any>(
     ['cc-feedback'], '/v1/feedback', { limit: '3', sort: 'recent' },
+  );
+
+  // Wave 7 Brief 06 — cross-check flags today (owner-only, endpoint is owner-only)
+  const { data: crossCheck } = useApiGet<PayrollCrossCheckResponse>(
+    ['cc-cross-check-today', today],
+    '/v1/reports/payroll-cross-check',
+    { from_date: today, to_date: today, status: 'flagged' },
+    { enabled: isOwner, staleTime: 60_000 },
+  );
+
+  // Unverified services this week (visible to anyone who can view the report:
+  // owner/div_mgr/coordinator). The card itself is just a compact link.
+  const { data: unverified } = useApiGet<ServiceVerificationResponse>(
+    ['cc-unverified-week', week.from, week.to],
+    '/v1/reports/service-verification',
+    { from_date: week.from, to_date: week.to, verification: 'unverified' },
+    { staleTime: 60_000 },
   );
 
   // Auto-refresh crews every 60s
@@ -103,8 +140,62 @@ export default function CommandCenterPage() {
         </Button>
       </div>
 
+      {/* Cross-check flags today (owner-only) */}
+      {isOwner && crossCheck && crossCheck.totals.flagged_count > 0 ? (
+        <Link
+          to={`/reports/gps/payroll-cross-check?from_date=${today}&to_date=${today}&status=flagged`}
+          className="block"
+          aria-label="View today's cross-check flags"
+        >
+          <Card className="border-red-300 bg-red-50 hover:bg-red-100 transition-colors">
+            <CardContent className="pt-4 pb-4 flex items-center gap-3">
+              <AlertTriangle className="h-5 w-5 text-red-700 shrink-0" />
+              <div className="flex-1">
+                <p className="font-medium text-red-900">
+                  {crossCheck.totals.flagged_count} cross-check flag
+                  {crossCheck.totals.flagged_count === 1 ? '' : 's'} today
+                </p>
+                <p className="text-sm text-red-800">
+                  Click to review payroll cross-check differences &gt; 30 min.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      ) : null}
+
       {/* Summary Cards */}
       {summary && <SummaryCards summary={summary} />}
+
+      {/* Unverified services this week — compact info card (coordinator+) */}
+      {unverified ? (
+        <Link
+          to={`/reports/gps/service-verification?from_date=${week.from}&to_date=${week.to}&verification=unverified`}
+          className="block"
+          aria-label="View unverified services this week"
+        >
+          <Card className="hover:bg-muted/50 transition-colors">
+            <CardContent className="pt-4 pb-4 flex items-center gap-3">
+              {unverified.totals.unverified === 0 ? (
+                <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+              ) : (
+                <AlertTriangle className="h-5 w-5 text-yellow-600 shrink-0" />
+              )}
+              <div className="flex-1">
+                <p className="font-medium">
+                  {unverified.totals.unverified} unverified service
+                  {unverified.totals.unverified === 1 ? '' : 's'} this week
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {unverified.totals.unverified === 0
+                    ? 'All services this week verified by GPS.'
+                    : 'Click to review services without GPS verification.'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      ) : null}
 
       {/* Main panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -241,4 +241,63 @@ describe('CommandCenterPage', () => {
     renderPage();
     expect(screen.getByRole('button', { name: /Refresh/i })).toBeInTheDocument();
   });
+
+  // 20. Wave 7 Brief 06 — cross-check flags banner for owners when flagged_count > 0
+  it('owner sees cross-check flags banner when flagged_count > 0', () => {
+    mockUseApiGet.mockImplementation((key: string[]) => {
+      if (key[0] === 'command-center-summary') return { data: mockSummary, isLoading: false, refetch: mockRefetch };
+      if (key[0] === 'cc-crew-positions') return { data: { positions: mockCrews }, refetch: mockRefetch };
+      if (key[0] === 'cc-billing-drafts') return { data: mockDrafts, refetch: mockRefetch };
+      if (key[0] === 'cc-billing-overdue') return { data: mockOverdue, refetch: mockRefetch };
+      if (key[0] === 'cc-season-summary') return { data: mockSeason, refetch: mockRefetch };
+      if (key[0] === 'cc-feedback') return { data: mockFeedback, refetch: mockRefetch };
+      if (key[0] === 'cc-cross-check-today') return { data: { totals: { days_reviewed: 1, flagged_count: 3, consistent_count: 0 }, rows: [] }, refetch: mockRefetch };
+      if (key[0] === 'cc-unverified-week') return { data: { totals: { total: 0, verified: 0, unverified: 0, no_gps: 0, verification_rate: 0 }, rows: [] }, refetch: mockRefetch };
+      return { data: null, isLoading: false, refetch: mockRefetch };
+    });
+    renderPage();
+
+    const banner = screen.getByRole('link', { name: /view today's cross-check flags/i });
+    expect(banner).toBeInTheDocument();
+    expect(banner).toHaveTextContent(/3 cross-check flag/);
+    expect(banner.getAttribute('href')).toMatch(/\/reports\/gps\/payroll-cross-check/);
+    expect(banner.getAttribute('href')).toMatch(/status=flagged/);
+  });
+
+  // 21. Banner hidden when flagged_count == 0
+  it('cross-check banner is hidden when flagged_count is 0', () => {
+    mockUseApiGet.mockImplementation((key: string[]) => {
+      if (key[0] === 'cc-cross-check-today') return { data: { totals: { days_reviewed: 0, flagged_count: 0, consistent_count: 0 }, rows: [] }, refetch: mockRefetch };
+      if (key[0] === 'command-center-summary') return { data: mockSummary, isLoading: false, refetch: mockRefetch };
+      if (key[0] === 'cc-crew-positions') return { data: { positions: mockCrews }, refetch: mockRefetch };
+      if (key[0] === 'cc-billing-drafts') return { data: mockDrafts, refetch: mockRefetch };
+      if (key[0] === 'cc-billing-overdue') return { data: mockOverdue, refetch: mockRefetch };
+      if (key[0] === 'cc-season-summary') return { data: mockSeason, refetch: mockRefetch };
+      if (key[0] === 'cc-feedback') return { data: mockFeedback, refetch: mockRefetch };
+      return { data: null, isLoading: false, refetch: mockRefetch };
+    });
+    renderPage();
+
+    expect(screen.queryByRole('link', { name: /view today's cross-check flags/i })).toBeNull();
+  });
+
+  // 22. Unverified services card renders with this-week date range
+  it('renders unverified services card with this-week link', () => {
+    mockUseApiGet.mockImplementation((key: string[]) => {
+      if (key[0] === 'cc-unverified-week') return { data: { totals: { total: 10, verified: 6, unverified: 4, no_gps: 0, verification_rate: 60 }, rows: [] }, refetch: mockRefetch };
+      if (key[0] === 'command-center-summary') return { data: mockSummary, isLoading: false, refetch: mockRefetch };
+      if (key[0] === 'cc-crew-positions') return { data: { positions: mockCrews }, refetch: mockRefetch };
+      if (key[0] === 'cc-billing-drafts') return { data: mockDrafts, refetch: mockRefetch };
+      if (key[0] === 'cc-billing-overdue') return { data: mockOverdue, refetch: mockRefetch };
+      if (key[0] === 'cc-season-summary') return { data: mockSeason, refetch: mockRefetch };
+      if (key[0] === 'cc-feedback') return { data: mockFeedback, refetch: mockRefetch };
+      return { data: null, isLoading: false, refetch: mockRefetch };
+    });
+    renderPage();
+
+    const link = screen.getByRole('link', { name: /view unverified services this week/i });
+    expect(link).toHaveTextContent(/4 unverified service/);
+    expect(link.getAttribute('href')).toMatch(/\/reports\/gps\/service-verification/);
+    expect(link.getAttribute('href')).toMatch(/verification=unverified/);
+  });
 });

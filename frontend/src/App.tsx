@@ -49,6 +49,16 @@ import SettingsPage from './pages/settings/SettingsPage';
 import UserListPage from './pages/settings/UserListPage';
 import UserDetailPage from './pages/settings/UserDetailPage';
 import ReportsPage from './pages/reports/ReportsPage';
+import ReportsLayout from './pages/reports/ReportsLayout';
+import ReportsHome from './pages/reports/ReportsHome';
+import SeasonCompletionReport from './pages/reports/SeasonCompletionReport';
+import PayrollCrossCheckReport from './pages/reports/PayrollCrossCheckReport';
+import OccurrenceStatusReport from './pages/reports/OccurrenceStatusReport';
+import SkippedVisitsReport from './pages/reports/SkippedVisitsReport';
+import TierPerformanceReport from './pages/reports/TierPerformanceReport';
+import PropertyVisitHistoryReport from './pages/reports/PropertyVisitHistoryReport';
+import ServiceVerificationReport from './pages/reports/ServiceVerificationReport';
+import RoutePerformanceReport from './pages/reports/RoutePerformanceReport';
 import NotificationPage from './pages/notifications/NotificationPage';
 import SeasonalListPage from './pages/seasonal/SeasonalListPage';
 import SeasonalDetailPage from './pages/seasonal/SeasonalDetailPage';
@@ -174,8 +184,19 @@ export default function App() {
           <Route path="/settings/templates/:tab" element={<TemplatesPage />} />
 
           {/* Reports */}
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/reports/analytics" element={<DashboardPage />} />
+          <Route path="/reports" element={<ReportsLayout />}>
+            <Route index element={<ReportsHome />} />
+            <Route path="financial" element={<ReportsPage />} />
+            <Route path="analytics" element={<DashboardPage />} />
+            <Route path="operations/season-completion" element={<SeasonCompletionReport />} />
+            <Route path="operations/occurrence-status" element={<OccurrenceStatusReport />} />
+            <Route path="operations/skipped-visits" element={<SkippedVisitsReport />} />
+            <Route path="operations/tier-performance" element={<TierPerformanceReport />} />
+            <Route path="gps/property-visits" element={<PropertyVisitHistoryReport />} />
+            <Route path="gps/payroll-cross-check" element={<PayrollCrossCheckReport />} />
+            <Route path="gps/service-verification" element={<ServiceVerificationReport />} />
+            <Route path="gps/route-performance" element={<RoutePerformanceReport />} />
+          </Route>
 
           {/* Notifications */}
           <Route path="/notifications" element={<NotificationPage />} />
