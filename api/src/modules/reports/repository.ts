@@ -2,6 +2,62 @@ import { queryDb } from '../../config/database.js';
 
 // --- Result types ---
 
+// Wave 7 Brief 04 (I-5) Service Package Analytics row shapes
+export interface SeasonCompletionRow {
+  service_code: string;
+  service_name: string;
+  per_season: number;
+  total: number;
+  done: number;
+  assigned: number;
+  pending: number;
+  skipped: number;
+  completion_rate: number;
+}
+export interface OccurrenceStatusRow {
+  occurrence_id: string;
+  service_code: string;
+  service_name: string;
+  occurrence_number: number;
+  status: string;
+  assigned_date: string | null;
+  preferred_month: string | null;
+  customer_id: string;
+  customer_name: string;
+  customer_number: string | null;
+  property_id: string;
+  street_address: string | null;
+  city: string | null;
+  property_category: string | null;
+  job_id: string | null;
+  job_number: string | null;
+  service_tier: string;
+}
+export interface SkippedVisitRow {
+  id: string;
+  skipped_date: string | null;
+  skipped_reason: string | null;
+  recovery_date: string | null;
+  occurrence_number: number;
+  service_name: string;
+  is_included_in_invoice: boolean;
+  customer_name: string;
+  customer_number: string | null;
+  street_address: string | null;
+  service_tier: string;
+  bronze_billing_type: string | null;
+}
+export interface TierPerformanceRow {
+  tier: string;
+  active_contracts: number;
+  season_revenue: number;
+  avg_contract_value: number;
+  total_occurrences: number;
+  skipped_visits: number;
+  service_completion_rate: number | null;
+  clients_retained_pct: number;
+}
+
 export interface RevenueRow { period: string; revenue: string; }
 export interface RevenueDivisionRow { division: string; revenue: string; }
 export interface RevenueCustomerRow { customer_id: string; customer_name: string; revenue: string; invoice_count: string; }
@@ -430,4 +486,318 @@ export async function getMaterialUsage(
     params,
   );
   return res.rows;
+}
+
+// ============================================
+// Wave 7 Brief 04 — Service Package Analytics (I-5)
+// ============================================
+
+interface SeasonCompletionRawRow {
+  service_code: string;
+  service_name: string;
+  per_season: string;
+  total: string;
+  done: string;
+  assigned: string;
+  pending: string;
+  skipped: string;
+  completion_rate: string | null;
+}
+
+export async function getSeasonCompletion(
+  tenantId: string,
+  seasonYear: number,
+  division?: string,
+  tier?: string,
+): Promise<SeasonCompletionRow[]> {
+  const conds: string[] = ['so.tenant_id = $1', 'so.season_year = $2'];
+  const params: unknown[] = [tenantId, seasonYear];
+  let pi = 3;
+
+  if (tier) {
+    conds.push(`sc.service_tier = $${pi}`);
+    params.push(tier);
+    pi++;
+  }
+  if (division) {
+    conds.push(`sc.division = $${pi}`);
+    params.push(division);
+    pi++;
+  }
+
+  const res = await queryDb<SeasonCompletionRawRow>(
+    `SELECT
+        so.service_code,
+        so.service_name,
+        MAX(so.occurrence_number)::text AS per_season,
+        COUNT(*)::text AS total,
+        COUNT(*) FILTER (WHERE so.status = 'completed')::text AS done,
+        COUNT(*) FILTER (WHERE so.status = 'assigned')::text AS assigned,
+        COUNT(*) FILTER (WHERE so.status = 'pending')::text AS pending,
+        COUNT(*) FILTER (WHERE so.status = 'skipped')::text AS skipped,
+        ROUND(
+          (COUNT(*) FILTER (WHERE so.status IN ('completed', 'assigned'))::numeric
+           / NULLIF(COUNT(*), 0)::numeric) * 100, 1
+        )::text AS completion_rate
+     FROM service_occurrences so
+     JOIN service_contracts sc ON sc.id = so.contract_id AND sc.tenant_id = so.tenant_id
+     WHERE ${conds.join(' AND ')}
+     GROUP BY so.service_code, so.service_name
+     ORDER BY so.service_name`,
+    params,
+  );
+
+  return res.rows.map((r) => ({
+    service_code: r.service_code,
+    service_name: r.service_name,
+    per_season: Number(r.per_season),
+    total: Number(r.total),
+    done: Number(r.done),
+    assigned: Number(r.assigned),
+    pending: Number(r.pending),
+    skipped: Number(r.skipped),
+    completion_rate: r.completion_rate ? Number(r.completion_rate) : 0,
+  }));
+}
+
+interface OccurrenceStatusRawRow extends Omit<OccurrenceStatusRow, 'occurrence_number'> {
+  occurrence_number: number | string;
+}
+
+export async function getOccurrenceStatus(
+  tenantId: string,
+  serviceCode: string,
+  seasonYear: number,
+  opts: { status?: string; category?: string; occurrence_number?: number } = {},
+): Promise<OccurrenceStatusRow[]> {
+  const conds: string[] = ['so.tenant_id = $1', 'so.service_code = $2', 'so.season_year = $3'];
+  const params: unknown[] = [tenantId, serviceCode, seasonYear];
+  let pi = 4;
+
+  if (opts.status) {
+    conds.push(`so.status = $${pi}`);
+    params.push(opts.status);
+    pi++;
+  }
+  if (opts.category) {
+    conds.push(`p.property_category = $${pi}`);
+    params.push(opts.category);
+    pi++;
+  }
+  if (opts.occurrence_number !== undefined) {
+    conds.push(`so.occurrence_number = $${pi}`);
+    params.push(opts.occurrence_number);
+    pi++;
+  }
+
+  const res = await queryDb<OccurrenceStatusRawRow>(
+    `SELECT
+        so.id                    AS occurrence_id,
+        so.service_code,
+        so.service_name,
+        so.occurrence_number,
+        so.status,
+        so.assigned_date,
+        so.preferred_month,
+        c.id                     AS customer_id,
+        c.display_name           AS customer_name,
+        c.customer_number,
+        p.id                     AS property_id,
+        p.street_address,
+        p.city,
+        p.property_category,
+        j.id                     AS job_id,
+        j.job_number,
+        sc.service_tier
+     FROM service_occurrences so
+     JOIN customers c          ON c.id  = so.customer_id
+     JOIN properties p         ON p.id  = so.property_id
+     JOIN service_contracts sc ON sc.id = so.contract_id
+     LEFT JOIN jobs j          ON j.id  = so.job_id
+     WHERE ${conds.join(' AND ')}
+     ORDER BY c.display_name, p.street_address`,
+    params,
+  );
+
+  return res.rows.map((r) => ({
+    ...r,
+    occurrence_number: Number(r.occurrence_number),
+  }));
+}
+
+interface SkippedVisitRawRow {
+  id: string;
+  skipped_date: string | null;
+  skipped_reason: string | null;
+  recovery_date: string | null;
+  occurrence_number: number | string;
+  service_name: string;
+  is_included_in_invoice: boolean;
+  customer_name: string;
+  customer_number: string | null;
+  street_address: string | null;
+  service_tier: string;
+  bronze_billing_type: string | null;
+}
+
+export async function getSkippedVisits(
+  tenantId: string,
+  seasonYear: number,
+  opts: { tier?: string; from_date?: string; to_date?: string } = {},
+): Promise<SkippedVisitRow[]> {
+  const conds: string[] = ['so.tenant_id = $1', "so.status = 'skipped'", 'so.season_year = $2'];
+  const params: unknown[] = [tenantId, seasonYear];
+  let pi = 3;
+
+  if (opts.tier) {
+    conds.push(`sc.service_tier = $${pi}`);
+    params.push(opts.tier);
+    pi++;
+  }
+  if (opts.from_date) {
+    conds.push(`so.skipped_date >= $${pi}`);
+    params.push(opts.from_date);
+    pi++;
+  }
+  if (opts.to_date) {
+    conds.push(`so.skipped_date <= $${pi}`);
+    params.push(opts.to_date);
+    pi++;
+  }
+
+  const res = await queryDb<SkippedVisitRawRow>(
+    `SELECT
+        so.id,
+        so.skipped_date,
+        so.skipped_reason,
+        so.recovery_date,
+        so.occurrence_number,
+        so.service_name,
+        so.is_included_in_invoice,
+        c.display_name           AS customer_name,
+        c.customer_number,
+        p.street_address,
+        sc.service_tier,
+        sc.bronze_billing_type
+     FROM service_occurrences so
+     JOIN customers c          ON c.id  = so.customer_id
+     JOIN properties p         ON p.id  = so.property_id
+     JOIN service_contracts sc ON sc.id = so.contract_id
+     WHERE ${conds.join(' AND ')}
+     ORDER BY so.skipped_date DESC NULLS LAST`,
+    params,
+  );
+
+  return res.rows.map((r) => ({
+    ...r,
+    occurrence_number: Number(r.occurrence_number),
+  }));
+}
+
+interface TierPerformanceRawRow {
+  tier: string;
+  active_contracts: string;
+  season_revenue: string;
+  avg_contract_value: string | null;
+  total_occurrences: string;
+  skipped_visits: string;
+  service_completion_rate: string | null;
+  clients_retained_pct: string | null;
+}
+
+export async function getTierPerformance(
+  tenantId: string,
+  seasonYear: number,
+): Promise<TierPerformanceRow[]> {
+  // NOTE: the spec references `season_year_active` and `status='active_season'` —
+  // neither exists in the current schema (confirmed against migration 029).
+  // We substitute EXTRACT(YEAR FROM season_start_date) and status = 'active'.
+  const res = await queryDb<TierPerformanceRawRow>(
+    `WITH active_contracts AS (
+       SELECT sc.service_tier AS tier, COUNT(*)::text AS count
+       FROM service_contracts sc
+       WHERE sc.tenant_id = $1
+         AND EXTRACT(YEAR FROM sc.season_start_date) = $2
+         AND sc.status = 'active'
+         AND sc.deleted_at IS NULL
+       GROUP BY sc.service_tier
+     ),
+     revenue AS (
+       SELECT sc.service_tier AS tier,
+              SUM(bs.planned_amount * bs.total_invoices_in_season)::text AS season_revenue
+       FROM service_contracts sc
+       JOIN billing_schedule bs ON bs.contract_id = sc.id
+       WHERE sc.tenant_id = $1
+         AND EXTRACT(YEAR FROM sc.season_start_date) = $2
+         AND sc.deleted_at IS NULL
+       GROUP BY sc.service_tier
+     ),
+     occurrences AS (
+       SELECT sc.service_tier AS tier,
+              COUNT(*)::text AS total_occurrences,
+              COUNT(*) FILTER (WHERE so.status IN ('completed', 'assigned'))::text AS ok_occ,
+              COUNT(*) FILTER (WHERE so.status = 'skipped')::text AS skipped_visits
+       FROM service_contracts sc
+       LEFT JOIN service_occurrences so
+         ON so.contract_id = sc.id AND so.season_year = $2
+       WHERE sc.tenant_id = $1
+         AND EXTRACT(YEAR FROM sc.season_start_date) = $2
+         AND sc.deleted_at IS NULL
+       GROUP BY sc.service_tier
+     ),
+     retention AS (
+       SELECT sc.service_tier AS tier,
+              ROUND(
+                COUNT(DISTINCT CASE WHEN prior.id IS NOT NULL THEN sc.id END)::numeric
+                / NULLIF(COUNT(DISTINCT sc.id), 0) * 100, 0
+              )::text AS clients_retained_pct
+       FROM service_contracts sc
+       LEFT JOIN service_contracts prior
+         ON prior.customer_id = sc.customer_id
+        AND EXTRACT(YEAR FROM prior.season_start_date) = $2 - 1
+        AND prior.service_tier = sc.service_tier
+        AND prior.deleted_at IS NULL
+       WHERE sc.tenant_id = $1
+         AND EXTRACT(YEAR FROM sc.season_start_date) = $2
+         AND sc.deleted_at IS NULL
+       GROUP BY sc.service_tier
+     )
+     SELECT
+       t.tier,
+       COALESCE(ac.count, '0')               AS active_contracts,
+       COALESCE(r.season_revenue, '0')       AS season_revenue,
+       CASE
+         WHEN COALESCE(ac.count::int, 0) > 0
+         THEN ROUND(COALESCE(r.season_revenue::numeric, 0) / ac.count::numeric, 2)::text
+         ELSE '0'
+       END                                    AS avg_contract_value,
+       COALESCE(occ.total_occurrences, '0')  AS total_occurrences,
+       COALESCE(occ.skipped_visits, '0')     AS skipped_visits,
+       CASE
+         WHEN t.tier = 'bronze' THEN NULL
+         WHEN COALESCE(occ.total_occurrences::int, 0) > 0
+         THEN ROUND(occ.ok_occ::numeric / occ.total_occurrences::numeric * 100, 0)::text
+         ELSE '0'
+       END                                    AS service_completion_rate,
+       COALESCE(ret.clients_retained_pct, '0') AS clients_retained_pct
+     FROM (VALUES ('gold'), ('silver'), ('bronze')) AS t(tier)
+     LEFT JOIN active_contracts ac ON ac.tier = t.tier
+     LEFT JOIN revenue r           ON r.tier  = t.tier
+     LEFT JOIN occurrences occ     ON occ.tier = t.tier
+     LEFT JOIN retention ret       ON ret.tier = t.tier
+     ORDER BY CASE t.tier WHEN 'gold' THEN 1 WHEN 'silver' THEN 2 ELSE 3 END`,
+    [tenantId, seasonYear],
+  );
+
+  return res.rows.map((r) => ({
+    tier: r.tier,
+    active_contracts: Number(r.active_contracts),
+    season_revenue: Number(r.season_revenue),
+    avg_contract_value: r.avg_contract_value ? Number(r.avg_contract_value) : 0,
+    total_occurrences: Number(r.total_occurrences),
+    skipped_visits: Number(r.skipped_visits),
+    service_completion_rate:
+      r.service_completion_rate === null ? null : Number(r.service_completion_rate),
+    clients_retained_pct: r.clients_retained_pct ? Number(r.clients_retained_pct) : 0,
+  }));
 }
