@@ -11,7 +11,6 @@ import {
   addLineItemSchema,
   updateLineItemSchema,
   generatePdfSchema,
-  sendQuoteSchema,
   xeroItemSearchSchema,
   jobIdParamsSchema,
   quoteIdParamsSchema,

@@ -100,7 +100,7 @@ export async function loadTemplateIntoQuote(
   quoteId: string,
   input: LoadTemplateInput,
   tenantId: string,
-  userId: string,
+  _userId: string,
 ) {
   const template = await repo.findById(input.template_id, tenantId);
   if (!template) {

@@ -26,7 +26,7 @@ export async function generateOccurrences(
   tenantId: string,
   contractId: string,
   seasonYear: number,
-  userId: string,
+  _userId: string,
 ) {
   const contract = await contractRepo.findById(tenantId, contractId);
   if (!contract) {

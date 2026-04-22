@@ -80,7 +80,7 @@ export async function duplicateTemplate(tenantId: string, id: string, userId: st
 
 // ======== Steps ========
 
-export async function addStep(tenantId: string, templateId: string, input: CreateStepInput, userId: string) {
+export async function addStep(tenantId: string, templateId: string, input: CreateStepInput, _userId: string) {
   const template = await repo.findTemplateById(tenantId, templateId);
   if (!template) {
     throw new AppError(404, 'Template not found');
@@ -91,7 +91,7 @@ export async function addStep(tenantId: string, templateId: string, input: Creat
   return repo.createStep(tenantId, templateId, input as Record<string, unknown>);
 }
 
-export async function updateStep(tenantId: string, stepId: string, input: UpdateStepInput, userId: string) {
+export async function updateStep(tenantId: string, stepId: string, input: UpdateStepInput, _userId: string) {
   const step = await repo.findStepById(tenantId, stepId);
   if (!step) {
     throw new AppError(404, 'Step not found');
@@ -124,7 +124,7 @@ export async function deleteStep(tenantId: string, stepId: string) {
   return repo.softDeleteStep(tenantId, stepId);
 }
 
-export async function reorderSteps(tenantId: string, templateId: string, input: ReorderStepsInput, userId: string) {
+export async function reorderSteps(tenantId: string, templateId: string, input: ReorderStepsInput, _userId: string) {
   const template = await repo.findTemplateById(tenantId, templateId);
   if (!template) {
     throw new AppError(404, 'Template not found');

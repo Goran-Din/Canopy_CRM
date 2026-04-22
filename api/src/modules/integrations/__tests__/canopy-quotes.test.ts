@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
-import bcrypt from 'bcrypt';
 
 const mockQueryDb = vi.fn();
 const mockGetClient = vi.fn();
@@ -72,10 +71,7 @@ vi.mock('../canopy-quotes/webhook-dispatcher.js', () => ({
 
 import app from '../../../app.js';
 
-const TEST_PASSWORD = 'TestPass123';
-let TEST_HASH: string;
 const TENANT_A = 'aaaaaaaa-0000-0000-0000-000000000001';
-const USER_ID = 'cccccccc-0000-0000-0000-000000000001';
 const CUSTOMER_ID = 'dddddddd-0000-0000-0000-000000000001';
 const PROPERTY_ID = 'eeeeeeee-0000-0000-0000-000000000001';
 const JOB_ID = '33333333-0000-0000-0000-000000000001';
@@ -115,7 +111,6 @@ let mockClient: ReturnType<typeof createMockClient>;
 
 beforeEach(async () => {
   vi.clearAllMocks();
-  TEST_HASH = await bcrypt.hash(TEST_PASSWORD, 4);
   mockClient = createMockClient();
   mockGetClient.mockResolvedValue(mockClient);
   mockQueryDb.mockResolvedValue({ rows: [], rowCount: 0 });
@@ -125,7 +120,7 @@ beforeEach(async () => {
 // Helper: mock API key auth
 function setupApiKeyAuth() {
   // The apiKeyAuth middleware queries integration_configs
-  mockQueryDb.mockImplementation((sql: string, params?: unknown[]) => {
+  mockQueryDb.mockImplementation((sql: string, _params?: unknown[]) => {
     if (typeof sql === 'string' && sql.includes('integration_configs') && sql.includes('provider')) {
       return Promise.resolve({
         rows: [{ tenant_id: TENANT_A, config_data: { api_key: API_KEY }, status: 'active' }],

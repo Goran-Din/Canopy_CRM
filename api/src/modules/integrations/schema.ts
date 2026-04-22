@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 const providers = ['xero', 'mautic', 'google_drive', 'canopy_quotes', 'canopy_ops', 'northchat'] as const;
-const integrationStatuses = ['active', 'inactive', 'error', 'pending_setup'] as const;
 const syncStatuses = ['pending', 'success', 'failed', 'skipped'] as const;
 
 // ======== Integration Config ========

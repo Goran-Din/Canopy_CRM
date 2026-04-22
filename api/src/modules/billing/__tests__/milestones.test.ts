@@ -105,7 +105,6 @@ import app from '../../../app.js';
 const TEST_PASSWORD = 'TestPass123';
 let TEST_HASH: string;
 const TENANT_A = 'aaaaaaaa-0000-0000-0000-000000000001';
-const TENANT_B = 'aaaaaaaa-0000-0000-0000-000000000002';
 const USER_ID = 'cccccccc-0000-0000-0000-000000000001';
 const JOB_ID = '33333333-0000-0000-0000-000000000001';
 const MILESTONE_ID = 'bbbb3333-0000-0000-0000-000000000001';

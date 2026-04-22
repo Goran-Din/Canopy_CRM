@@ -29,7 +29,7 @@ function formatMonth(date: Date): string {
 export async function createBillingSchedule(
   tenantId: string,
   contractId: string,
-  userId: string,
+  _userId: string,
 ) {
   const contract = await contractRepo.findById(tenantId, contractId);
   if (!contract) throw new AppError(404, 'Contract not found');
@@ -650,8 +650,6 @@ export async function generateMilestoneInvoice(
   }
 
   const amount = Number(milestone.computed_amount ?? 0);
-  const dueDate = milestone.due_date
-    ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   const client = await repo.acquireClient();
   try {

@@ -1,5 +1,8 @@
 import { logger } from '../../../config/logger.js';
-import { generateMonthlyDrafts } from '../service.js';
+// NOTE: generateMonthlyDrafts is not called here yet — this cron is a
+// documented placeholder (see the log line below). Real tenant iteration
+// and multi-tenant draft generation will land in a later brief. Import
+// restored when the placeholder is replaced.
 
 /**
  * Monthly draft generation cron job.

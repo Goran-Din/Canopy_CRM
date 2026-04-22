@@ -1,4 +1,4 @@
-import { queryDb, getClient } from '../../config/database.js';
+import { queryDb } from '../../config/database.js';
 import type { DisputeQuery, CreditNoteQuery } from './schema.js';
 
 // --- Types ---

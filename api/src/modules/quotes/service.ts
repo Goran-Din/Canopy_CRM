@@ -188,7 +188,7 @@ export async function addSection(
   tenantId: string,
   quoteId: string,
   input: AddSectionInput,
-  userId: string,
+  _userId: string,
 ) {
   const quote = await repo.getById(tenantId, quoteId);
   if (!quote) {
@@ -283,7 +283,7 @@ export async function addLineItem(
   quoteId: string,
   sectionId: string,
   input: AddLineItemInput,
-  userId: string,
+  _userId: string,
 ) {
   const quote = await repo.getById(tenantId, quoteId);
   if (!quote) throw new AppError(404, 'Quote not found');
@@ -816,7 +816,7 @@ export async function loadTemplate(
   tenantId: string,
   quoteId: string,
   input: LoadTemplateInput,
-  userId: string,
+  _userId: string,
 ) {
   const quote = await repo.getById(tenantId, quoteId);
   if (!quote) throw new AppError(404, 'Quote not found');
