@@ -34,7 +34,7 @@ export async function createBillingSchedule(
   const contract = await contractRepo.findById(tenantId, contractId);
   if (!contract) throw new AppError(404, 'Contract not found');
 
-  const c = contract as Record<string, unknown>;
+  const c = contract as unknown as Record<string, unknown>;
   const serviceTier = c.service_tier as string | undefined;
   const seasonStartDate = c.season_start_date as string | undefined;
 
@@ -255,7 +255,7 @@ export async function generateMonthlyDrafts(tenantId: string, billingDate: strin
       const contract = await contractRepo.findById(tenantId, entry.contract_id);
       if (!contract) continue;
 
-      const c = contract as Record<string, unknown>;
+      const c = contract as unknown as Record<string, unknown>;
       const serviceTier = c.service_tier as string;
       let draftData: InvoiceDraftData;
 

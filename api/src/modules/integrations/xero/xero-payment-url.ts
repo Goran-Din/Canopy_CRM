@@ -12,12 +12,12 @@ export async function retrievePaymentUrl(
 ): Promise<string | null> {
   try {
     const { xeroRequest } = await import('./xero-client.js');
-    const response = await xeroRequest(
+    const response = (await xeroRequest(
       tenantId, 'GET', `/Invoices/${xeroInvoiceId}?unitdp=4`, null,
-    );
+    )) as { Invoices?: Array<{ OnlineInvoiceUrl?: string }> } | undefined;
 
     const invoice = response?.Invoices?.[0];
-    const onlineUrl = invoice?.OnlineInvoiceUrl as string | undefined;
+    const onlineUrl = invoice?.OnlineInvoiceUrl;
 
     if (onlineUrl) {
       await queryDb(

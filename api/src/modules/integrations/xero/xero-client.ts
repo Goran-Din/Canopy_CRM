@@ -72,7 +72,7 @@ async function refreshAccessToken(tenantId: string, refreshToken: string): Promi
   await repo.updateTokens(tenantId, 'xero', data.access_token, data.refresh_token, expiresAt);
 }
 
-async function xeroRequest(
+export async function xeroRequest(
   tenantId: string, method: string, path: string, body?: unknown,
 ): Promise<unknown> {
   const { token, xeroTenantId } = await getAccessToken(tenantId);
