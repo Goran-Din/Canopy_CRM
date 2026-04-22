@@ -80,12 +80,11 @@ vi.mock('../../jobs/diary/diary.repository.js', () => ({
 }));
 
 import app from '../../../app.js';
-import { fireAutomation, resolveMergeFields, sendTestMessage } from '../service.js';
+import { fireAutomation, resolveMergeFields } from '../service.js';
 
 const TEST_PASSWORD = 'TestPass123';
 let TEST_HASH: string;
 const TENANT_A = 'aaaaaaaa-0000-0000-0000-000000000001';
-const TENANT_B = 'aaaaaaaa-0000-0000-0000-000000000002';
 const USER_ID = 'cccccccc-0000-0000-0000-000000000001';
 const JOB_ID = '33333333-0000-0000-0000-000000000001';
 const CUSTOMER_ID = 'dddddddd-0000-0000-0000-000000000001';

@@ -85,10 +85,6 @@ export interface QuoteTotals {
   total_amount: number;
 }
 
-interface CountRow {
-  count: string;
-}
-
 // === Quotes ===
 
 export async function insert(

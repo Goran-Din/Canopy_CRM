@@ -1,7 +1,6 @@
 import crypto from 'node:crypto';
 import { logger } from '../../../config/logger.js';
 import { queryDb } from '../../../config/database.js';
-import * as repo from '../repository.js';
 import type { Request, Response } from 'express';
 
 /**

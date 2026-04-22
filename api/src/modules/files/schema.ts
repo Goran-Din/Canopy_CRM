@@ -9,10 +9,6 @@ const uploadSources = [
   'crew_app', 'staff_web', 'client_portal', 'system',
 ] as const;
 
-const folderTypes = [
-  'agreements', 'quotes', 'invoices', 'photos', 'renders', 'internal', 'custom',
-] as const;
-
 // --- Upload flow ---
 
 export const uploadUrlSchema = z.object({

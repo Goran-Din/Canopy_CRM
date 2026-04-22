@@ -8,6 +8,11 @@ export const diaryEntryTypes = [
   'automation_fired', 'photo_uploaded', 'crew_assigned',
   'crew_clocked_in', 'crew_clocked_out', 'note_added',
   'job_created', 'job_converted_to_wo',
+  // Wave 5-7 additions — NOT YET in the Postgres CHECK constraint
+  // (migration 022). A follow-up migration must ALTER the constraint
+  // before these code paths run against a real DB. Tracked for Wave 8.
+  'milestone_setup', 'milestone_invoiced', 'milestone_cancelled',
+  'quote_resent', 'invoice_from_quote', 'quote_declined',
 ] as const;
 
 export type DiaryEntryType = typeof diaryEntryTypes[number];

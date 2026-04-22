@@ -746,7 +746,7 @@ export function installStateMocks(state: WorkflowState, mocks: WorkflowMocks): v
     _clientOrRow: unknown,
     row?: Record<string, unknown>,
   ): Promise<DiaryEntry> => {
-    const actualRow = (row ?? _clientOrRow) as Record<string, unknown>;
+    const actualRow = (row ?? _clientOrRow) as unknown as Record<string, unknown>;
     const entry: DiaryEntry = {
       id: crypto.randomUUID(),
       tenant_id: actualRow.tenant_id as string,
@@ -754,7 +754,7 @@ export function installStateMocks(state: WorkflowState, mocks: WorkflowMocks): v
       entry_type: actualRow.entry_type as string,
       title: actualRow.title as string,
       body: (actualRow.body as string | null) ?? null,
-      metadata: (actualRow.metadata as Record<string, unknown> | null) ?? null,
+      metadata: (actualRow.metadata as unknown as Record<string, unknown> | null) ?? null,
       created_by_user_id: (actualRow.created_by_user_id as string | null) ?? null,
       is_system_entry: (actualRow.is_system_entry as boolean) ?? false,
       created_at: new Date().toISOString(),
@@ -864,7 +864,7 @@ export function installStateMocks(state: WorkflowState, mocks: WorkflowMocks): v
       const patched: QuoteRow = { ...existing };
       for (const [k, v] of Object.entries(data)) {
         if (v !== undefined) {
-          (patched as Record<string, unknown>)[k] = v;
+          (patched as unknown as Record<string, unknown>)[k] = v;
         }
       }
       patched.updated_at = new Date();

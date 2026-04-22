@@ -143,7 +143,6 @@ vi.mock('../../modules/jobs/diary/diary.repository.js', () => ({
 
 import app from '../../app.js';
 import {
-  TENANT_A,
   CONTRACT_ID,
   WorkflowState,
   makeContract,

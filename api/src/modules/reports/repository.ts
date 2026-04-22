@@ -126,7 +126,6 @@ export interface PipelineWinRow { total_projects: string; won: string; lost: str
 export interface ProspectConversionRow { source: string; total: string; converted: string; conversion_rate: string; total_value: string; }
 export interface EquipmentSummaryRow { status: string; count: string; }
 export interface MaterialUsageRow { category: string; month: string; total_quantity: string; total_cost: string; }
-interface CountRow { count: string; }
 
 // ============================================
 // Revenue Reports

@@ -365,7 +365,7 @@ export async function updateMilestone(
 
 // === Dashboard ===
 
-interface DashboardStats {
+export interface DashboardStats {
   pending_review: string;
   total_scheduled: string;
   total_approved: string;

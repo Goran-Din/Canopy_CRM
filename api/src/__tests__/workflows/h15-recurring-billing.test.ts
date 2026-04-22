@@ -246,7 +246,7 @@ beforeEach(() => {
       if (!existing) return null;
       const updated: InvoiceDraftRow = { ...existing };
       for (const [k, v] of Object.entries(patch)) {
-        if (v !== undefined) (updated as Record<string, unknown>)[k] = v;
+        if (v !== undefined) (updated as unknown as Record<string, unknown>)[k] = v;
       }
       state.invoiceDrafts.set(id, updated);
       return updated;

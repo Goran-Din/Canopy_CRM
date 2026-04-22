@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
-import bcrypt from 'bcrypt';
 
 const mockQueryDb = vi.fn();
 
@@ -57,8 +56,6 @@ vi.mock('../xero/xero-webhook.js', () => ({
 
 import app from '../../../app.js';
 
-const TEST_PASSWORD = 'TestPass123';
-let TEST_HASH: string;
 const TENANT_A = 'aaaaaaaa-0000-0000-0000-000000000001';
 const JOB_ID = '33333333-0000-0000-0000-000000000001';
 const CUSTOMER_ID = 'dddddddd-0000-0000-0000-000000000001';
@@ -83,20 +80,8 @@ const V2_PAYLOAD_JOB_NUMBER = {
   job_number: '0047-26',
 };
 
-function setupApiKeyAuth() {
-  mockQueryDb.mockImplementation((sql: string, params?: unknown[]) => {
-    if (typeof sql === 'string' && sql.includes('integration_configs') && sql.includes('provider')) {
-      return Promise.resolve({
-        rows: [{ tenant_id: TENANT_A, config_data: { api_key: API_KEY }, status: 'active' }],
-      });
-    }
-    return Promise.resolve({ rows: [], rowCount: 0 });
-  });
-}
-
 beforeEach(async () => {
   vi.clearAllMocks();
-  TEST_HASH = await bcrypt.hash(TEST_PASSWORD, 4);
   mockQueryDb.mockResolvedValue({ rows: [], rowCount: 0 });
 });
 

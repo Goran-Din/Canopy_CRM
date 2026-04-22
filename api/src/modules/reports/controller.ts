@@ -98,7 +98,7 @@ function escapeCsvValue(v: unknown): string {
   return s;
 }
 
-function rowsToCsv<T extends Record<string, unknown>>(rows: T[], columns: (keyof T)[]): string {
+function rowsToCsv<T extends object>(rows: T[], columns: (keyof T)[]): string {
   if (rows.length === 0) {
     return columns.map((c) => String(c)).join(',') + '\n';
   }

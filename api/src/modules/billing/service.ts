@@ -29,12 +29,12 @@ function formatMonth(date: Date): string {
 export async function createBillingSchedule(
   tenantId: string,
   contractId: string,
-  userId: string,
+  _userId: string,
 ) {
   const contract = await contractRepo.findById(tenantId, contractId);
   if (!contract) throw new AppError(404, 'Contract not found');
 
-  const c = contract as Record<string, unknown>;
+  const c = contract as unknown as Record<string, unknown>;
   const serviceTier = c.service_tier as string | undefined;
   const seasonStartDate = c.season_start_date as string | undefined;
 
@@ -255,7 +255,7 @@ export async function generateMonthlyDrafts(tenantId: string, billingDate: strin
       const contract = await contractRepo.findById(tenantId, entry.contract_id);
       if (!contract) continue;
 
-      const c = contract as Record<string, unknown>;
+      const c = contract as unknown as Record<string, unknown>;
       const serviceTier = c.service_tier as string;
       let draftData: InvoiceDraftData;
 
@@ -650,8 +650,6 @@ export async function generateMilestoneInvoice(
   }
 
   const amount = Number(milestone.computed_amount ?? 0);
-  const dueDate = milestone.due_date
-    ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   const client = await repo.acquireClient();
   try {

@@ -148,7 +148,7 @@ export async function addMilestone(
   tenantId: string,
   projectId: string,
   input: CreateMilestoneInput,
-  userId: string,
+  _userId: string,
 ) {
   const project = await repo.findProjectById(tenantId, projectId);
   if (!project) {
@@ -162,7 +162,7 @@ export async function updateMilestone(
   tenantId: string,
   milestoneId: string,
   input: UpdateMilestoneInput,
-  userId: string,
+  _userId: string,
 ) {
   const existing = await repo.findMilestoneById(tenantId, milestoneId);
   if (!existing) {

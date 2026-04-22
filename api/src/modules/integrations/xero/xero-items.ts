@@ -144,8 +144,21 @@ export async function syncXeroItems(
   try {
     // Call Xero Items API via xero-client
     const { xeroRequest } = await import('./xero-client.js');
-    const xeroResponse = await xeroRequest(tenantId, 'GET', '/Items', null);
-    const xeroItems = xeroResponse?.Items ?? [];
+    interface XeroSalesDetails {
+      Description?: string;
+      AccountCode?: string;
+      UnitPrice?: number;
+    }
+    interface XeroItemDto {
+      ItemID?: string;
+      Code?: string;
+      Name?: string;
+      SalesDetails?: XeroSalesDetails;
+      UpdatedDateUTC?: string;
+    }
+    const xeroResponse = (await xeroRequest(tenantId, 'GET', '/Items', null)) as
+      { Items?: XeroItemDto[] } | undefined;
+    const xeroItems: XeroItemDto[] = xeroResponse?.Items ?? [];
 
     const xeroIdSet: string[] = [];
 

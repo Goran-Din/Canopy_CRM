@@ -121,7 +121,7 @@ export async function fireAutomation(
   if (context.customer_id) {
     const customer = await customerRepo.findById(tenantId, context.customer_id);
     if (customer) {
-      const c = customer as Record<string, unknown>;
+      const c = customer as unknown as Record<string, unknown>;
       recipientEmail = (c.email as string) ?? null;
       recipientPhone = (c.phone as string) ?? null;
       context.customer = c;
@@ -150,7 +150,7 @@ export async function fireAutomation(
   if (config.template_id) {
     const template = await templateRepo.findById(config.template_id, tenantId);
     if (template) {
-      const content = template.content as Record<string, unknown>;
+      const content = template.content as unknown as Record<string, unknown>;
       subject = (content.email_subject as string) ?? (content.subject as string) ?? '';
       body = (content.email_body as string) ?? '';
     }
@@ -288,7 +288,7 @@ export function resolveMergeFields(
   template: string,
   context: AutomationContext,
 ): string {
-  const customer = context.customer as Record<string, unknown> | undefined;
+  const customer = context.customer as unknown as Record<string, unknown> | undefined;
 
   const fields: Record<string, string> = {
     client_first_name: (customer?.first_name as string) ?? '',
@@ -327,7 +327,7 @@ export async function sendTestMessage(
   if (config?.template_id) {
     const template = await templateRepo.findById(config.template_id, tenantId);
     if (template) {
-      const content = template.content as Record<string, unknown>;
+      const content = template.content as unknown as Record<string, unknown>;
       subject = `[TEST] ${(content.email_subject as string) ?? (content.subject as string) ?? input.automation_type}`;
       body = (content.email_body as string) ?? body;
     }

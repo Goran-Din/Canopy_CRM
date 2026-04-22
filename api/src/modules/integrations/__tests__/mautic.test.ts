@@ -460,7 +460,7 @@ describe('Sync log', () => {
 describe('Multi-tenant isolation', () => {
   it('should scope push to correct tenant', async () => {
     process.env.MAUTIC_ENABLED = 'true';
-    mockQueryDb.mockImplementation((sql: string, params?: unknown[]) => {
+    mockQueryDb.mockImplementation((sql: string, _params?: unknown[]) => {
       if (typeof sql === 'string' && sql.includes('quotes_v2')) {
         return Promise.resolve({ rows: [SAMPLE_QUOTE_ROW] });
       }

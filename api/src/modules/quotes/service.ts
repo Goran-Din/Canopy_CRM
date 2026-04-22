@@ -188,7 +188,7 @@ export async function addSection(
   tenantId: string,
   quoteId: string,
   input: AddSectionInput,
-  userId: string,
+  _userId: string,
 ) {
   const quote = await repo.getById(tenantId, quoteId);
   if (!quote) {
@@ -283,7 +283,7 @@ export async function addLineItem(
   quoteId: string,
   sectionId: string,
   input: AddLineItemInput,
-  userId: string,
+  _userId: string,
 ) {
   const quote = await repo.getById(tenantId, quoteId);
   if (!quote) throw new AppError(404, 'Quote not found');
@@ -461,8 +461,8 @@ export async function generatePdf(
     version: quote.version,
     created_at: String(quote.created_at),
     valid_until: quote.valid_until,
-    customer_name: (quote as Record<string, unknown>).customer_display_name as string ?? '',
-    property_address: (quote as Record<string, unknown>).property_name as string ?? '',
+    customer_name: (quote as unknown as Record<string, unknown>).customer_display_name as string ?? '',
+    property_address: (quote as unknown as Record<string, unknown>).property_name as string ?? '',
     sections: (quote.sections ?? []).map(s => ({
       section_title: s.section_title,
       section_body: s.section_body,
@@ -484,7 +484,7 @@ export async function generatePdf(
   };
 
   const pdfBuffer = await pdfService.generatePdfBuffer(htmlData);
-  const customerId = (quote as Record<string, unknown>).customer_id as string ?? '';
+  const customerId = (quote as unknown as Record<string, unknown>).customer_id as string ?? '';
 
   const { file_id } = await pdfService.uploadQuotePdf(
     tenantId, customerId, quote.quote_number, quote.version, pdfBuffer, false,
@@ -689,13 +689,13 @@ export async function getSignedPdf(tenantId: string, quoteId: string) {
     throw new AppError(422, 'Quote is not signed');
   }
 
-  if (!(quote as Record<string, unknown>).signed_pdf_file_id) {
+  if (!(quote as unknown as Record<string, unknown>).signed_pdf_file_id) {
     throw new AppError(404, 'Signed PDF not yet generated');
   }
 
   return {
-    signed_pdf_file_id: (quote as Record<string, unknown>).signed_pdf_file_id,
-    download_url: `/v1/files/${(quote as Record<string, unknown>).signed_pdf_file_id}/download`,
+    signed_pdf_file_id: (quote as unknown as Record<string, unknown>).signed_pdf_file_id,
+    download_url: `/v1/files/${(quote as unknown as Record<string, unknown>).signed_pdf_file_id}/download`,
     expires_at: new Date(Date.now() + 3600000).toISOString(), // 1 hour
   };
 }
@@ -716,7 +716,7 @@ export async function convertToInvoice(
   }
 
   // Check not already converted
-  if ((quote as Record<string, unknown>).converted_invoice_id) {
+  if ((quote as unknown as Record<string, unknown>).converted_invoice_id) {
     throw new AppError(409, 'An invoice has already been created from this quote');
   }
 
@@ -765,9 +765,9 @@ export async function convertToInvoice(
        RETURNING id, invoice_number`,
       [
         tenantId,
-        (quote as Record<string, unknown>).customer_id ??
+        (quote as unknown as Record<string, unknown>).customer_id ??
           (await client.query(`SELECT customer_id FROM jobs WHERE id = $1`, [quote.job_id])).rows[0]?.customer_id,
-        (quote as Record<string, unknown>).property_id ??
+        (quote as unknown as Record<string, unknown>).property_id ??
           (await client.query(`SELECT property_id FROM jobs WHERE id = $1`, [quote.job_id])).rows[0]?.property_id,
         quote.job_id,
         totalAmount,
@@ -816,7 +816,7 @@ export async function loadTemplate(
   tenantId: string,
   quoteId: string,
   input: LoadTemplateInput,
-  userId: string,
+  _userId: string,
 ) {
   const quote = await repo.getById(tenantId, quoteId);
   if (!quote) throw new AppError(404, 'Quote not found');

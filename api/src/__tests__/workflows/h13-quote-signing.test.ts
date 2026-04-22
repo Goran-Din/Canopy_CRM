@@ -209,7 +209,6 @@ vi.mock('../../modules/templates/repository.js', () => ({
 
 import app from '../../app.js';
 import {
-  TENANT_A,
   CUSTOMER_ID,
   PROPERTY_ID,
   WorkflowState,

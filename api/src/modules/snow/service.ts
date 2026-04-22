@@ -201,7 +201,7 @@ export async function addEntry(
   tenantId: string,
   runId: string,
   input: CreateEntryInput,
-  userId: string,
+  _userId: string,
 ) {
   const run = await repo.findRunById(tenantId, runId);
   if (!run) {
@@ -214,7 +214,7 @@ export async function addEntry(
 export async function bulkCreateEntries(
   tenantId: string,
   runId: string,
-  userId: string,
+  _userId: string,
 ) {
   const run = await repo.findRunById(tenantId, runId);
   if (!run) {
@@ -235,7 +235,7 @@ export async function updateEntry(
   tenantId: string,
   entryId: string,
   input: UpdateEntryInput,
-  userId: string,
+  _userId: string,
 ) {
   const existing = await repo.findEntryById(tenantId, entryId);
   if (!existing) {

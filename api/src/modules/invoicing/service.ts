@@ -206,7 +206,7 @@ export async function addLineItem(
   tenantId: string,
   invoiceId: string,
   input: AddLineItemInput,
-  userId: string,
+  _userId: string,
 ) {
   const invoice = await repo.findInvoiceById(tenantId, invoiceId);
   if (!invoice) {
@@ -226,7 +226,7 @@ export async function updateLineItem(
   tenantId: string,
   lineItemId: string,
   input: UpdateLineItemInput,
-  userId: string,
+  _userId: string,
 ) {
   const existing = await repo.getLineItemById(tenantId, lineItemId);
   if (!existing) {
@@ -251,7 +251,7 @@ export async function updateLineItem(
 export async function removeLineItem(
   tenantId: string,
   lineItemId: string,
-  userId: string,
+  _userId: string,
 ) {
   const existing = await repo.getLineItemById(tenantId, lineItemId);
   if (!existing) {

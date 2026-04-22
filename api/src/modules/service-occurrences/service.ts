@@ -26,19 +26,19 @@ export async function generateOccurrences(
   tenantId: string,
   contractId: string,
   seasonYear: number,
-  userId: string,
+  _userId: string,
 ) {
   const contract = await contractRepo.findById(tenantId, contractId);
   if (!contract) {
     throw new AppError(404, 'Contract not found');
   }
 
-  const packageServices = (contract as Record<string, unknown>).package_services as PackageService[] | undefined;
+  const packageServices = (contract as unknown as Record<string, unknown>).package_services as PackageService[] | undefined;
   if (!packageServices || !Array.isArray(packageServices) || packageServices.length === 0) {
     throw new AppError(400, 'Contract has no package services defined');
   }
 
-  const serviceTier = (contract as Record<string, unknown>).service_tier as string | undefined;
+  const serviceTier = (contract as unknown as Record<string, unknown>).service_tier as string | undefined;
   const occurrences: repo.OccurrenceInsert[] = [];
 
   for (const service of packageServices) {

@@ -11,7 +11,7 @@ import * as xeroMapper from './xero-mapper.js';
 
 // ======== Sync Customer ========
 
-export async function syncCustomer(tenantId: string, customerId: string, userId: string) {
+export async function syncCustomer(tenantId: string, customerId: string, _userId: string) {
   await integrationService.getActiveConfig(tenantId, 'xero');
 
   const custRes = await queryDb<Record<string, unknown>>(
@@ -45,7 +45,7 @@ export async function syncCustomer(tenantId: string, customerId: string, userId:
 
 // ======== Sync Invoice ========
 
-export async function syncInvoice(tenantId: string, invoiceId: string, userId: string) {
+export async function syncInvoice(tenantId: string, invoiceId: string, _userId: string) {
   await integrationService.getActiveConfig(tenantId, 'xero');
 
   const invRes = await queryDb<Record<string, unknown>>(
@@ -101,7 +101,7 @@ export async function syncInvoice(tenantId: string, invoiceId: string, userId: s
 
 // ======== Sync Payment ========
 
-export async function syncPayment(tenantId: string, paymentId: string, userId: string) {
+export async function syncPayment(tenantId: string, paymentId: string, _userId: string) {
   await integrationService.getActiveConfig(tenantId, 'xero');
 
   const payRes = await queryDb<Record<string, unknown>>(

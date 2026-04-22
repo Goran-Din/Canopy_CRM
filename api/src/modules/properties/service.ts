@@ -62,7 +62,7 @@ export async function createProperty(
   if (input.latitude != null && input.longitude != null) {
     geofenceService.setDefaultGeofence(
       property.id, input.latitude, input.longitude,
-      (input as Record<string, unknown>).property_category as string | undefined,
+      (input as unknown as Record<string, unknown>).property_category as string | undefined,
     ).catch(() => {
       // Geofence setup failure should not fail property creation
     });
@@ -166,7 +166,7 @@ export async function getEstimationContext(
 ) {
   const property = await repo.findById(tenantId, propertyId);
   if (!property) throw new AppError(404, 'Property not found');
-  return serviceHistoryService.getEstimationContext(tenantId, propertyId, serviceCode, property as Record<string, unknown>);
+  return serviceHistoryService.getEstimationContext(tenantId, propertyId, serviceCode, property as unknown as Record<string, unknown>);
 }
 
 export async function getCrewNotes(tenantId: string, propertyId: string) {

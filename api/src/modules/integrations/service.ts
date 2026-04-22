@@ -26,8 +26,8 @@ export async function updateConfig(tenantId: string, provider: string, input: Up
 }
 
 export async function connect(tenantId: string, provider: string, input: ConnectInput, userId: string) {
-  // Upsert config with provided data
-  const config = await repo.upsertConfig(tenantId, provider, {
+  // Upsert config with provided data (return value unused — call is for its side effect)
+  await repo.upsertConfig(tenantId, provider, {
     config_data: input.config_data || {},
   }, userId);
 

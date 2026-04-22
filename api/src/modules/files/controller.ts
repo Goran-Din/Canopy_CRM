@@ -5,7 +5,7 @@ import * as fileService from './service.js';
 
 export async function listFolders(req: Request, res: Response, next: NextFunction) {
   try {
-    const userRole = req.user!.roles?.[0]?.role_name || req.user!.roles?.[0]?.role || '';
+    const userRole = req.user!.roles?.[0]?.role || '';
     const includeInternal = userRole !== 'client';
     const folders = await fileService.listFolders(
       req.tenantId!,
@@ -35,7 +35,7 @@ export async function createFolder(req: Request, res: Response, next: NextFuncti
 
 export async function getUploadUrl(req: Request, res: Response, next: NextFunction) {
   try {
-    const userRole = req.user!.roles?.[0]?.role_name || req.user!.roles?.[0]?.role || '';
+    const userRole = req.user!.roles?.[0]?.role || '';
     const isClientUpload = userRole === 'client';
     const result = await fileService.getUploadUrl(
       req.tenantId!,
@@ -75,7 +75,7 @@ export async function getFile(req: Request, res: Response, next: NextFunction) {
 
 export async function listFiles(req: Request, res: Response, next: NextFunction) {
   try {
-    const userRole = req.user!.roles?.[0]?.role_name || req.user!.roles?.[0]?.role || '';
+    const userRole = req.user!.roles?.[0]?.role || '';
     const portalOnly = userRole === 'client';
     const result = await fileService.listFiles(
       req.tenantId!,
@@ -91,7 +91,7 @@ export async function listFiles(req: Request, res: Response, next: NextFunction)
 
 export async function getDownloadUrl(req: Request, res: Response, next: NextFunction) {
   try {
-    const userRole = req.user!.roles?.[0]?.role_name || req.user!.roles?.[0]?.role || '';
+    const userRole = req.user!.roles?.[0]?.role || '';
     const clientIp = req.ip || req.socket.remoteAddress || '';
     const result = await fileService.getDownloadUrl(
       req.tenantId!,
